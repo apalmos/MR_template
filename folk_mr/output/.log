@@ -1,0 +1,34 @@
+*******************************************************************
+* Genome-wide Complex Trait Analysis (GCTA)
+* version 1.92.4 beta2 Linux
+* (C) 2010-2019, The University of Queensland
+* Please report bugs to Jian Yang <jian.yang@uq.edu.au>
+*******************************************************************
+Analysis started at 11:15:59 UTC on Sat Mar 26 2022.
+Hostname: noded09
+
+Accepted options:
+--bfile /scratch/groups/ukbiobank/usr/alish/Project1_meta/1KG_Phase3.WG.CLEANED.EUR_MAF001
+--gsmr-file marker.txt ad.txt
+--gsmr-direction 2
+--effect-plot
+--ref-ld-chr /scratch/groups/ukbiobank/KCL_Data/Software/eur_w_ld_chr_for_mtcojo/
+--w-ld-chr /scratch/groups/ukbiobank/KCL_Data/Software/eur_w_ld_chr_for_mtcojo/
+--out ./output/
+--gwas-thresh 5e-06
+--clump-r2 0.05
+--heidi-thresh 0.01
+--gsmr-snp-min 1
+--gsmr-ld-fdr 0
+--thread-num 4
+
+Warning: The number of SNP instruments included in the analysis is too small. There might not be enough SNPs to perform the HEIDI-outlier analysis.
+
+Reading PLINK FAM file from [/scratch/groups/ukbiobank/usr/alish/Project1_meta/1KG_Phase3.WG.CLEANED.EUR_MAF001.fam].
+404 individuals to be included from [/scratch/groups/ukbiobank/usr/alish/Project1_meta/1KG_Phase3.WG.CLEANED.EUR_MAF001.fam].
+Reading PLINK BIM file from [/scratch/groups/ukbiobank/usr/alish/Project1_meta/1KG_Phase3.WG.CLEANED.EUR_MAF001.bim].
+23247316 SNPs to be included from [/scratch/groups/ukbiobank/usr/alish/Project1_meta/1KG_Phase3.WG.CLEANED.EUR_MAF001.bim].
+
+Reading GWAS summary data for exposure(s) from [marker.txt].
+Error: Format of file [marker.txt] is not correct, line 1.
+An error occurs, please check the options or data
