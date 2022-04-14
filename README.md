@@ -18,3 +18,6 @@ bash ./re_make_input.R
 This will also show you how many files still need to be run. 
 
 I'm still working on optimising the number of arrays, as it's taking a long time to run on the current HPC. 
+
+## Then activate all bash jobs by running: 
+bash ./begin.sh
