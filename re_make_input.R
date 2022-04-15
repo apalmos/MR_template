@@ -1,13 +1,13 @@
-## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 rm(list=ls())
 
 
-## ----setup, include=FALSE--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## ----setup, include=FALSE--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 wd <- getwd()
 setwd(wd)
 
 
-## ----include=FALSE---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## ----include=FALSE---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 library(data.table)
 library(jtools)
 library(knitr)
@@ -15,529 +15,60 @@ library(broom)
 library(sandwich)
 library(tidyverse)
 library(ggplot2)
-
 library(sgof)
 
 
 
-## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-#SUN
+make_list <- function(study, dir){
 
-setwd("./sun_mr/output/")
+  current_dir <- dir
+  setwd(paste0(current_dir,"/",study,"_mr/output/"))
 
-sun_list <- list.files(pattern = "*.gsmr")
+  list <- list.files(pattern = "*.gsmr")
+  mr <- lapply(list, read.delim)
+  bind <- do.call(rbind.data.frame, mr)
+  bind$file_name = rep(list, each =2)
+  n_lists <- list.files(path = paste0(current_dir,"/",study,"_mr/"), pattern = "_original")
 
-sun_mr = lapply(sun_list, read.delim)
+  worked = data.frame()
+  worked <- unique(bind$file_name)
+  worked = data.frame(worked)
+  worked$worked <-   gsub("\\..*","",worked$worked)
 
-sun_mr <- do.call(rbind.data.frame, sun_mr)
+  for (i in n_lists){
 
-sun_mr$file_name <- rep(sun_list, each=2)
+    list <- read.table(paste0(current_dir,"/",study,"_mr/",i))
+    names(list)[1] <- "worked"
+    worked_list <- setdiff(list$worked, worked$worked)
+    worked_list = data.frame(worked_list)
+    names(worked_list)[1] <- "worked"
+    re_do <- merge(worked_list, list)
+    i <- gsub("_original", "", i)
 
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(sun_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("sun_1: ", nrow(re_do)))
+    write.table(x = re_do, file = paste0(current_dir,"/",study,"_mr/",i,".txt"), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
+    print(paste0("from ", study,"_",i,": ", nrow(re_do)," to go"))
 
-worked = data.frame()
-worked <- unique(sun_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list2.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list2.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("sun_2: ", nrow(re_do)))
+  }
 
-worked = data.frame()
-worked <- unique(sun_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list3.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list3.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("sun_3: ", nrow(re_do)))
+  setwd(dir)
 
-worked = data.frame()
-worked <- unique(sun_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list4.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list4.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(nrow(re_do))
-print(paste0("sun_4: ", nrow(re_do)))
+}
 
-setwd("../../")
 
 
-## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-#SUHRE
-setwd("./suhr_mr/output/")
-
-suhre_list <- list.files(pattern = "*.gsmr")
-
-suhre_mr = lapply(suhre_list, read.delim)
-
-suhre_mr <- do.call(rbind.data.frame, suhre_mr)
-
-suhre_mr$file_name <- rep(suhre_list, each=2)
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(suhre_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("suhre_1: ", nrow(re_do)))
-
-worked = data.frame()
-worked <- unique(suhre_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list2.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list2.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(nrow(re_do))
-print(paste0("suhre_2: ", nrow(re_do)))
-
-setwd("../../")
-
-
-
-## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#FOLK 
-
-setwd("./folk_mr/output/")
-
-folk_list <- list.files(pattern = "*.gsmr")
-
-folk_mr = lapply(folk_list, read.delim)
-
-folk_mr <- do.call(rbind.data.frame, folk_mr)
-
-folk_mr$file_name <- rep(folk_list, each=2)
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(folk_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("folk: ", nrow(re_do)))
-
-setwd("../../")
-
-
-
-## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#SLIZ 
-setwd("./sliz_mr/output/")
-
-sliz_list <- list.files(pattern = "*.gsmr")
-
-sliz_mr = lapply(sliz_list, read.delim)
-
-sliz_mr <- do.call(rbind.data.frame, sliz_mr)
-
-sliz_mr$file_name <- rep(sliz_list, each=2)
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(sliz_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("sliz: ", nrow(re_do)))
-
-setwd("../../")
-
-
-
-## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#WOOD
-setwd("./wood_mr/output/")
-
-wood_list <- list.files(pattern = "*.gsmr")
-
-wood_mr = lapply(wood_list, read.delim)
-
-wood_mr <- do.call(rbind.data.frame, wood_mr)
-
-wood_mr$file_name <- rep(wood_list, each=2)
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(wood_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("wood: ", nrow(re_do)))
-
-setwd("../../")
-
-
-
-## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#AHOL 
-setwd("./infl_mr/output/")
-
-ahol_list <- list.files(pattern = "*.gsmr")
-
-ahol_mr = lapply(ahol_list, read.delim)
-
-ahol_mr <- do.call(rbind.data.frame, ahol_mr)
-
-ahol_mr$file_name <- rep(ahol_list, each=2)
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(ahol_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("ahol: ", nrow(re_do)))
-
-setwd("../../")
-
-
-
-## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#SCALLOP
-setwd("./scal_mr/output/")
-
-scal_list <- list.files(pattern = "*.gsmr")
-
-scal_mr = lapply(scal_list, read.delim)
-
-scal_mr <- do.call(rbind.data.frame, scal_mr)
-
-scal_mr$file_name <- rep(scal_list, each=2)
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(scal_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("scal: ", nrow(re_do)))
-
-setwd("../../")
-
-
-
-## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#HILL
-setwd("./hill_mr/output/")
-
-hill_list <- list.files(pattern = "*.gsmr")
-
-hill_mr = lapply(hill_list, read.delim)
-
-hill_mr <- do.call(rbind.data.frame, hill_mr)
-
-hill_mr$file_name <- rep(hill_list, each=2)
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(hill_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("hill: ", nrow(re_do)))
-
-setwd("../../")
-
-
-
-## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#HOGL
-setwd("./hogl_mr/output/")
-
-hogl_list <- list.files(pattern = "*.gsmr")
-
-hogl_mr = lapply(hogl_list, read.delim)
-
-hogl_mr <- do.call(rbind.data.frame, hogl_mr)
-
-hogl_mr$file_name <- rep(hogl_list, each=2)
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(hogl_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("hogl: ", nrow(re_do)))
-
-setwd("../../")
-
-
-
-## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#ENROTH
-setwd("./enroth_mr/output/")
-
-enroth_list <- list.files(pattern = "*.gsmr")
-
-enroth_mr = lapply(enroth_list, read.delim)
-
-enroth_mr <- do.call(rbind.data.frame, enroth_mr)
-
-enroth_mr$file_name <- rep(enroth_list, each=2)
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(enroth_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("enroth: ", nrow(re_do)))
-
-setwd("../../")
-
-
-
-## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#DECO
-setwd("./deco_mr/output/")
-
-deco_list <- list.files(pattern = "*.gsmr")
-
-deco_mr = lapply(deco_list, read.delim)
-
-deco_mr <- do.call(rbind.data.frame, deco_mr)
-
-deco_mr$file_name <- rep(deco_list, each=2)
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(deco_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list1.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list1.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("deco1: ", nrow(re_do)))
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(deco_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list2.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list2.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("deco2: ", nrow(re_do)))
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(deco_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list3.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list3.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("deco3: ", nrow(re_do)))
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(deco_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list4.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list4.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("deco4: ", nrow(re_do)))
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(deco_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list5.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list5.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("deco5: ", nrow(re_do)))
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(deco_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list6.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list6.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("deco6: ", nrow(re_do)))
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(deco_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list7.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list7.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("deco7: ", nrow(re_do)))
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(deco_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list8.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list8.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("deco8: ", nrow(re_do)))
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(deco_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list9.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list9.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("deco9: ", nrow(re_do)))
-
-#very rough code to work out which runs may not have worked due to HPC memory issues 
-worked = data.frame()
-worked <- unique(deco_mr$file_name)
-worked = data.frame(worked)
-worked$worked <-   gsub("\\..*","",worked$worked)
-list <- read.table("../list10.txt", nrows = 500, header = FALSE)
-names(list)[1] <- "worked"
-test <- setdiff(list$worked, worked$worked)
-test = data.frame(test)
-names(test)[1] <- "worked"
-re_do <- merge(test, list)
-write.table(x = re_do, file = "../list10.txt", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
-print(paste0("deco10: ", nrow(re_do)))
-
-setwd("../../")
-
-
+make_list(study = "breth", dir = wd)
+make_list(study = "deco", dir = wd)
+make_list(study = "enroth", dir = wd)
+make_list(study = "folk", dir = wd)
+make_list(study = "hill", dir = wd)
+make_list(study = "hogl", dir = wd)
+make_list(study = "infl", dir = wd)
+make_list(study = "scal", dir = wd)
+make_list(study = "sliz", dir = wd)
+make_list(study = "suhr", dir = wd)
+make_list(study = "sun", dir = wd)
+make_list(study = "wood", dir = wd)
