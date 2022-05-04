@@ -2,6 +2,12 @@
 #SBATCH --nodes=1
 #SBATCH --mem-per-cpu=9G
 #SBATCH -t 48:00:00
+
+number=3
+
+column -t list${number}.txt > temp${number}
+mv temp${number} list${number}.txt
+
 while IFS=$'\t' read -r -a myArray
 do
 
@@ -12,4 +18,3 @@ do
 
 
 done < list3.txt
-
