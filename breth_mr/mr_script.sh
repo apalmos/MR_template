@@ -8,7 +8,7 @@ export MKL_NUM_THREADS=8
 export NUMEXPR_NUM_THREADS=8
 export OMP_NUM_THREADS=8
 
-/scratch/groups/ukbiobank/KCL_Data/Software/gcta_1.92.4beta2/gcta64 \
+/scratch/groups/ukbiobank/usr/alish/gcta/gcta \
 --bfile \
 /scratch/groups/ukbiobank/usr/alish/Project1_meta/1KG_Phase3.WG.CLEANED.EUR_MAF001 \
 --gsmr-file \
