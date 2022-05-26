@@ -2,6 +2,9 @@
 Template for running PWMR on Rosalind
 
 ## Copy entire repository into your desired folder 
+git clone https://github.com/apalmos/MR_template
+
+***SOON: an autoamted script creator, based on which studies you want to execute.
 
 ## Create a phenotype file for GSMR:
 echo 'name name_of_GWAS' > target.txt
