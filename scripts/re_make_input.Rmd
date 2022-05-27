@@ -41,7 +41,7 @@ make_list <- function(study, dir){
   mr <- lapply(list, read.delim)
   bind <- do.call(rbind.data.frame, mr)
   bind$file_name = rep(list, each =2)
-  n_lists <- list.files(path = paste0(current_dir,"/",study,"_mr/"), pattern = "_original")
+  n_lists <- list.files(path = paste0(current_dir,"/",study,"_mr/"), pattern = "^list")
 
   worked = data.frame()
   worked <- unique(bind$file_name)
@@ -50,15 +50,16 @@ make_list <- function(study, dir){
 
   for (i in n_lists){
 
-    list <- read.table(paste0(current_dir,"/",study,"_mr/",i))
-    names(list)[1] <- "worked"
+    list <- read.table(paste0(current_dir,"/",study,"_mr/",i), sep = ",")
+    names(list)[2] <- "worked"
     worked_list <- setdiff(list$worked, worked$worked)
     worked_list = data.frame(worked_list)
     names(worked_list)[1] <- "worked"
     re_do <- merge(worked_list, list)
-    i <- gsub("_original", "", i)
+    re_do <- re_do %>%
+      select(V1, worked)
 
-    write.table(x = re_do, file = paste0(current_dir,"/",study,"_mr/",i,".txt"), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t ")
+    write.table(x = re_do, file = paste0(current_dir,"/",study,"_mr/",i), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = ",")
     print(paste0("from ", study,"_",i,": ", nrow(re_do)," to go"))
 
   }

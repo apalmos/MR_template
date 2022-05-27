@@ -10,7 +10,7 @@ cp path_to_GWAS ./
 ```
 
 # Automated script creator
-# This script will generate all bash scripts needed to run these analyses in batches of 150. This is optimal given the thousands of GWAS files that need to be processed. Check one or two folders to make sure the bash scrips were created correctly
+This script will generate all bash scripts needed to run these analyses in batches of 150. This is optimal given the thousands of GWAS files that need to be processed. Check one or two folders to make sure the bash scrips were created correctly
 ```
 Rscript create_scripts.R
 ```
@@ -24,6 +24,7 @@ bash setting_up.sh GWAS_filename You_name_for_GWAS
 ```
 bash begin.sh
 ```
+Note: change the MR scripts according to your needs
 
 ## Once you reach the 48h limit, you need to make new input arrays. Do this by running:
 ```
@@ -36,3 +37,4 @@ This will also show you how many files still need to be run.
 ```
 bash begin.sh
 ```
+## Soon: analysis scripts for parsing all the data will be automated 
