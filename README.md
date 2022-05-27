@@ -99,6 +99,8 @@ cp path_to_GWAS ./
 
 # Automated script creator
 This script will generate all bash scripts needed to run these analyses in batches of 150. This is optimal given the thousands of GWAS files that need to be processed. Check one or two folders to make sure the bash scrips were created correctly
+
+Note: I highly recommend setting up a conda environment with the necessary R packages & the latest version of R (mainly tidyverse, dplyr, data.table). If you already have these in your base directory, please ignore.
 ```
 Rscript create_scripts.R
 ```
