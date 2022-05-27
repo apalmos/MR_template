@@ -52,9 +52,6 @@ for (j in dirs){
 
 
     clean <- c("#!/bin/bash",
-            "#SBATCH --nodes=8",
-            "#SBATCH --mem-per-cpu=18G",
-            "#SBATCH -t 48:00:00",
             " ",
             paste0("number=",i),
             "name=$1",
