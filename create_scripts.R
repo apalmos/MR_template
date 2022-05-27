@@ -29,7 +29,7 @@ for (j in dirs){
     flag <- paste0("flag",i,".txt")
 
     mr <- c("#!/bin/bash",
-            "#SBATCH --nodes=8",
+            "#SBATCH --nodes=4",
             "#SBATCH --mem-per-cpu=18G",
             "#SBATCH -t 48:00:00",
             " ",
@@ -80,7 +80,7 @@ for (j in dirs){
     writeLines(clean, paste0(dirs[n],"/mass_mr",i,".sh"))
 
     MR <- c("#!/bin/bash",
-            "#SBATCH --nodes=8",
+            "#SBATCH --nodes=4",
             "#SBATCH --mem-per-cpu=18G",
             "#SBATCH -t 48:00:00",
             " ",
