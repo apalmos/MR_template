@@ -54,10 +54,12 @@ Provided you have downloaded all the dependencies, you will just need your input
 
 Note that the reason for automating script creation is to distribute computational requirements across many runs. Running large jobs in parallel proved to take too long.
 
-I will soon add the automated analysis script, which can parse all output & run TwoSampleMR sensitivity analyses, MVMR for any multivariate analyses and MR-BMA, which is a Bayesian algorithm to perform risk factor selection in multivariable MR. I also have additional eQTL and QTLEnrich scripts for identifying target expression with your significant findings - these will also be appended to the pipeline. 
+I will soon add the automated analysis script, which can parse all output & run TwoSampleMR sensitivity analyses, MVMR for any multivariate analyses and MR-BMA, which is a Bayesian algorithm to perform risk factor selection in multivariable MR. I also have additional eQTL and QTLEnrich scripts for identifying target expression with your significant findings - these will also be appended to the pipeline.
 
 ## Copy entire repository into your desired folder
+```
 git clone https://github.com/apalmos/MR_template
+```
 
 You must install the latest version of GCTA, to make it work with the pipeline install it one directory higher than MR_template:
 
