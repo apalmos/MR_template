@@ -52,7 +52,7 @@ for (j in dirs){
     dirs_clean <- gsub("\\./","",dirs_clean)
     dirs_clean <- gsub("\\_mr","",dirs_clean)
 
-    writeLines(mr, paste0(dirs[n],"/MR",dirs_clean[n],i,".sh"), )
+    writeLines(mr, paste0(dirs[n],"/MR",dirs_clean[n],i,".sh"))
 
 
     clean <- c("#!/bin/bash",

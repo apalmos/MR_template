@@ -58,8 +58,11 @@ for (j in dirs){
             " ",
             paste0("done < list",i,".txt"))
 
-    writeLines(mr, paste0(dirs[n],"/MR",i,".sh"), )
+    dirs_clean <- dirs
+    dirs_clean <- gsub("\\./","",dirs_clean)
+    dirs_clean <- gsub("\\_mr","",dirs_clean)
 
+    writeLines(mr, paste0(dirs[n],"/MR",dirs_clean[n],i,".sh"))
 
     clean <- c("#!/bin/bash",
             "#SBATCH --nodes=8",
