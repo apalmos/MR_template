@@ -70,7 +70,7 @@ for (j in dirs){
             "    sleep 30s",
             "done",
             "rm flag${number}.txt",
-            "sleep 2m"
+            "sleep 30s"
     )
 
     writeLines(clean, paste0(dirs[n],"/mass_mr",i,".sh"))
