@@ -2,26 +2,73 @@
 
 #begin all analyses
 cd ./breth_mr
-sbatch -p brc MR*
+for f in MR*; do
+  sbatch -p brc "$f"
+done
+echo 'run breth'
+
 cd ../deco_mr
-sbatch -p brc MR*
+for f in MR*; do
+  sbatch -p brc "$f"
+done
+echo 'run deco'
+
 cd ../enroth_mr
-sbatch -p brc MR*
+for f in MR*; do
+  sbatch -p brc "$f"
+done
+echo 'run enroth'
+
 cd ../folk_mr
-sbatch -p brc MR*
+for f in MR*; do
+  sbatch -p brc "$f"
+done
+echo 'run folk'
+
 cd ../hill_mr
-sbatch -p brc MR*
+for f in MR*; do
+  sbatch -p brc "$f"
+done
+echo 'run hill'
+
 cd ../hogl_mr
-sbatch -p brc MR*
+for f in MR*; do
+  sbatch -p brc "$f"
+done
+echo 'run hogl'
+
 cd ../infl_mr
-sbatch -p brc MR*
+for f in MR*; do
+  sbatch -p brc "$f"
+done
+echo 'run infl'
+
 cd ../scal_mr
-sbatch -p brc MR*
+for f in MR*; do
+  sbatch -p brc "$f"
+done
+echo 'run scal'
+
 cd ../sliz_mr
-sbatch -p brc MR*
+for f in MR*; do
+  sbatch -p brc "$f"
+done
+echo 'run sliz'
+
 cd ../suhr_mr
-sbatch -p brc MR*
+for f in MR*; do
+  sbatch -p brc "$f"
+done
+echo 'run suhr'
+
 cd ../sun_mr
-sbatch -p brc MR*
+for f in MR*; do
+  sbatch -p brc "$f" 
+done
+echo 'run sun'
+
 cd ../wood_mr
-sbatch -p brc MR*
+for f in MR*; do
+  sbatch -p brc "$f"
+done
+echo 'run wood'

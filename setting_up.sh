@@ -3,9 +3,10 @@
 gwas=$1
 name=$2
 
-#create a target 
-echo '${name} ${gwas}' > target.txt
+#create a target
+echo ${name} ${gwas} > target.txt
 
+#copy GWAS into each folder
 cp ${gwas} ./breth_mr
 cp ${gwas} ./deco_mr
 cp ${gwas} ./enroth_mr
@@ -19,6 +20,7 @@ cp ${gwas} ./suhr_mr
 cp ${gwas} ./sun_mr
 cp ${gwas} ./wood_mr
 
+#copy target into each folder
 cp target.txt ./breth_mr
 cp target.txt ./deco_mr
 cp target.txt ./enroth_mr
@@ -32,27 +34,16 @@ cp target.txt ./suhr_mr
 cp target.txt ./sun_mr
 cp target.txt ./wood_mr
 
-cd ./breth_mr
-sbatch -p brc MR*
-cd ../deco_mr
-sbatch -p brc MR*
-cd ../enroth_mr
-sbatch -p brc MR*
-cd ../folk_mr
-sbatch -p brc MR*
-cd ../hill_mr
-sbatch -p brc MR*
-cd ../hogl_mr
-sbatch -p brc MR*
-cd ../infl_mr
-sbatch -p brc MR*
-cd ../scal_mr
-sbatch -p brc MR*
-cd ../sliz_mr
-sbatch -p brc MR*
-cd ../suhr_mr
-sbatch -p brc MR*
-cd ../sun_mr
-sbatch -p brc MR*
-cd ../wood_mr
-sbatch -p brc MR*
+#create output folder (in case they're not there already)
+mkdir ./breth_mr/output
+mkdir ./deco_mr/output
+mkdir ./enroth_mr/output
+mkdir ./folk_mr/output
+mkdir ./hill_mr/output
+mkdir ./hogl_mr/output
+mkdir ./infl_mr/output
+mkdir ./scal_mr/output
+mkdir ./sliz_mr/output
+mkdir ./suhr_mr/output
+mkdir ./sun_mr/output
+mkdir ./wood_mr/output
