@@ -1,26 +1,28 @@
 # MR_template
 Template for running PWMR on Rosalind
 
-## Copy entire repository into your desired folder 
+## Copy entire repository into your desired folder
 git clone https://github.com/apalmos/MR_template
 
-***SOON: an autoamted script creator, based on which studies you want to execute.
+## Copy your GWAS into the parent directory
+```
+cp path_to_GWAS ./
+```
 
-## Create a phenotype file for GSMR:
-echo 'name name_of_GWAS' > target.txt
+## Automated script creator
+# This script will generate all bash scripts needed to run these analyses in batches of 150. This is optimal given the thousands of GWAS files that need to be processed. Check one or two folders to make sure the bash scrips were created correctly
+Rscript create_scripts.R
 
-## To copy this into all directories run:
-bash ./copy_target.sh
+## Copy your GWAS into the parent direcotry (MR_template) & run
+bash setting_up.sh GWAS_filename You_name_for_GWAS
 
-## To copy GWAS file into all directories run: 
-bash ./copy_GWAS.sh
+## Start all jobs by submitting
+bash begin.sh
 
-## Once you reach the 48h limit, you need to make new input arrays. Do this by running: 
-bash ./re_make_input.R 
+## Once you reach the 48h limit, you need to make new input arrays. Do this by running:
+bash ./re_make_input.R
 
-This will also show you how many files still need to be run. 
+This will also show you how many files still need to be run.
 
-I'm still working on optimising the number of arrays, as it's taking a long time to run on the current HPC. 
-
-## Then activate all bash jobs by running: 
-bash ./begin.sh
+## Then activate all bash jobs again by running:
+bash begin.sh
