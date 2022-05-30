@@ -1,0 +1,74 @@
+cat<<'EOT'>> start_QTL.sh
+#!/bin/bash
+#SBATCH -n 20
+#SBATCH --mem-per-cpu=19G
+#SBATCH -t 48:00:00
+
+while IFS=$'\t' read -r -a myArray
+
+do
+
+  trimmedfile="$(echo -e "${myArray[1]}" | tr -d '[:space:]')"
+
+
+  sh qtl.sh $trimmedfile ${myArray[0]}
+
+
+done < qtl_files.txt
+EOT
+
+
+cat<<'EOT'>> qtl.sh
+#!/bin/bash
+#SBATCH -n 10
+#SBATCH --nodes=1
+#SBATCH --mem-per-cpu=19G
+#SBATCH -t 48:00:00
+
+file=$1
+
+/scratch/groups/ukbiobank/usr/alish/AD_MR/QTLEnrich/src/QTLEnrichV2.py \
+-G /scratch/groups/ukbiobank/usr/alish/AD_MR/sensitivity/AD_outcome/QTL/"${file}".gz \
+-D /scratch/groups/ukbiobank/usr/alish/AD_MR/QTLEnrich/data/AD_GTEx/ \
+-F .v8.egenes.txt.gz \
+-Q 'best_eqtl' \
+-C /scratch/groups/ukbiobank/usr/alish/AD_MR/QTLEnrich/data/GTEx_v8_Confounders_Table_49Tiss_Global.txt.gz \
+-N /scratch/groups/ukbiobank/usr/alish/AD_MR/QTLEnrich/data/GTEx_v8_Null_Table_49Tiss_Global.txt.gz \
+-g /scratch/groups/ukbiobank/usr/alish/AD_MR/QTLEnrich/data/GENCODE_26_df.txt \
+-O /scratch/groups/ukbiobank/usr/alish/AD_MR/sensitivity/AD_outcome/QTL/output \
+--exp_label ${file} \
+--keep_null_variants
+
+EOT
+
+
+**rubish**
+zcat /scratch/groups/ukbiobank/usr/alish/AD_MR/sensitivity/AD_outcome/QTL/LRRN1_deco.gz | grep '808039' combined.hm3_1kg.snplist.vanilla.jz2020.txt
+
+rs10000083
+grep 'rs10000083' /scratch/groups/gwas_sumstats combined.hm3_1kg.snplist.vanilla.jz2020.txt
+zcat all.bed.gz | grep 'rs201920982'
+awk -F, '$2 == "100003242" {p=1} p'
+
+
+cat<<'EOT'>> QQ_plot.sh
+#!/bin/bash
+#SBATCH -n 10
+#SBATCH --nodes=1
+#SBATCH --mem-per-cpu=19G
+#SBATCH -t 48:00:00
+
+/scratch/groups/ukbiobank/usr/alish/AD_MR/QTLEnrich/src/qqplot_qtlenrich.py \
+--gwas_file /scratch/groups/ukbiobank/usr/alish/AD_MR/sensitivity/AD_outcome/QTL/LRR1.gz \
+--qtl_file QTLEnrich_significant_gwas_p_values_best_eqtl_LRR1.gz_Brain_Cortex_Apr11_2022.txt \
+		      --pvalue_null_matrix $matrix \
+                      --gwas_background \
+                      --matched_null_background \
+		      --num_permutations \
+                      --confidence_interval \
+                      --show_title \
+                      --qqplot_title $title \
+                      --qtl_type $qtl \
+                      --tissue_label $tissue
+
+EOT

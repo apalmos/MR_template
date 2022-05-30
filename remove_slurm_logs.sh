@@ -1,5 +1,6 @@
 #!/bin/bash -l
 
+#this is a script to remove slurm logs (as they pile up very quickly). All logs can still be seen in the /output folder of each study 
 cd ./breth_mr
 rm slurm*
 rm BR*

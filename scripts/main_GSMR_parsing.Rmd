@@ -1,0 +1,441 @@
+---
+title: "AD_MR"
+author: "Alish Palmos"
+date: "09/02/2021"
+output: html_document
+editor_options:
+  chunk_output_type: console
+---
+
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+
+#Set-up
+```{r echo=FALSE}
+rm(list=ls())
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+setwd("/scratch/groups/ukbiobank/usr/alish/AD_MR/")
+```
+
+```{r include=FALSE}
+library(data.table)
+library(jtools)
+library(knitr)
+library(broom)
+library(sandwich)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(sgof)
+library(TwoSampleMR)
+library(qvalue)
+library(kableExtra)
+library(vroom)
+
+```
+
+
+```{r}
+#get MR function
+get_mr <- function(study, dir, extra = NULL){
+
+  if(is.null(extra)){
+
+  current_dir <- dir
+  setwd(paste0(current_dir,"/",study,"_mr/output/"))
+
+  list <- list.files(pattern = "*.gsmr")
+
+  mr <- lapply(list, read.delim)
+
+  bind <- do.call(rbind.data.frame, mr)
+
+  title <- str_to_title(study)
+
+  bind$study <- paste0(title)
+
+  bind$file_name <- rep(list, each=2)
+
+  bind <- bind %>%
+    filter(nsnp >= 1)
+
+  bind_n <- count(bind)
+
+  assign(paste0(study,"_mr"),value = bind)
+
+  }
+
+  else
+
+    current_dir <- dir
+
+  setwd(paste0(current_dir,"/",study,"_mr/",extra,"output/"))
+
+  list <- list.files(pattern = "*.gsmr")
+
+  mr <- lapply(list, read.delim)
+
+  bind <- do.call(rbind.data.frame, mr)
+
+  title <- str_to_title(study)
+
+  bind$study <- paste0(title)
+
+  bind$file_name <- rep(list, each=2)
+
+  bind <- bind %>%
+    filter(nsnp >= 1)
+
+  bind_n <- count(bind)
+
+  assign(paste0(study,"_mr"),value = bind)
+
+}
+
+```
+
+
+This RMarkdown shows the results from a MRWAS (Mendelian Randomization Wide Association Study).
+
+All currently available GWAS summary statistics of inflammatory markers were amassed over the course a few months.
+
+
+Covid GWAS used in this study:
+
+Very severe respiratory confirmed covid vs. not hospitalized covid - October data release (https://www.covid19hg.org/results/)
+
+
+
+Sun et al: https://pubmed.ncbi.nlm.nih.gov/29875488
+
+Suhre et al: https://pubmed.ncbi.nlm.nih.gov/28240269
+
+Wood et al: https://pubmed.ncbi.nlm.nih.gov/23696881
+
+Sliz et al: https://www.ncbi.nlm.nih.gov/pubmed/?term=31217265
+
+Folkerson et al: http://dx.plos.org/10.1371/journal.pgen.1006706
+
+Ahola et al: https://pubmed.ncbi.nlm.nih.gov/27989323
+
+Scallop et al: https://www.nature.com/articles/s42255-020-00287-2#Abs1
+
+Bretherik et al: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7337286
+
+
+Note that more studies are available for analyses. They're currently being cleaned and added as the data generation protocol progresses.
+
+
+GSMR was used as the base MR method: https://www.nature.com/articles/s41467-017-02317-2
+
+
+P-value threshold was set to 5E-6, due to lack of power in some GWAS. Thus, this study is exploratory.
+
+
+Only comparisons where 10+ SNPs were in common between the exposure and the outcome were included. This is routine MR practice.
+
+
+Bonferroni p-value threshold is stated below.
+
+#PROTEIN -> AD
+#Get all GSMR data
+
+```{r echo=FALSE}
+
+sun_mr <- get_mr(study = "sun", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/")
+suhre_mr <- get_mr(study = "suhre", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/")
+folk_mr <- get_mr(study = "folk", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/")
+sliz_mr <- get_mr(study = "sliz", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/")
+wood_mr <- get_mr(study = "wood", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/")
+ahol_mr <- get_mr(study = "ahol", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/")
+scal_mr <- get_mr(study = "scal", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/")
+hill_mr <- get_mr(study = "hill", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/")
+hogl_mr <- get_mr(study = "hogl", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/")
+enroth_mr <- get_mr(study = "enroth", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/")
+deco_mr <- get_mr(study = "deco", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/")
+
+```
+
+# Combine all to count how many exposures we had as proteins
+```{r echo=FALSE}
+# combine all to count how many exposures and outcomes we had
+mr_df_all <- rbind(folk_mr, sliz_mr, suhre_mr, sun_mr, wood_mr, ahol_mr, scal_mr, hill_mr, hogl_mr, enroth_mr, deco_mr)
+als <- str_count(mr_df_all$Exposure, "AD_Schwartzentruber")
+als[is.na(als)] <- 0
+sum(als)
+```
+
+# Combine all to count how many exposures we had as AD
+```{r}
+
+markers <- mr_df_all[mr_df_all$Outcome %like% "AD_Schwartzentruber", ]
+nrow(markers)
+
+```
+
+# Combine full data, work out odds ratios and 95% CI
+```{r}
+
+mr_df_all$Beta_exponent <- exp(mr_df_all$bxy)
+mr_df_all$LCI <- mr_df_all$Beta_exponent - (mr_df_all$se * 1.96)
+mr_df_all$UCI <- mr_df_all$Beta_exponent + (mr_df_all$se * 1.96)
+
+mr_df_all$Exposure <- gsub(".txt", "",mr_df_all$Exposure)
+mr_df_all$Outcome <- gsub(".txt", "",mr_df_all$Outcome)
+```
+
+# Compute q-values and add them to the large combined data frame
+```{r}
+pvalues <- mr_df_all$p
+qobj <- qvalue(p = pvalues)
+lfdr <- qobj$lfdr
+summary(qobj)
+hist(qobj)
+plot(qobj)
+
+qvalues <- as.matrix(qobj$qvalues)
+mr_df_all$qvalue <- cbind(qvalues)
+```
+
+# Adjusted p-values using SGoF method
+```{r}
+p <- SGoF(mr_df_all$p)
+summary(p)
+
+plot(p)
+
+p_list <- p$Adjusted.pvalues
+
+mr_df_all <- mr_df_all[order(mr_df_all$p),]
+mr_df_all$sgof <- p_list
+```
+
+# All effects AD outcome
+
+```{r}
+
+AD_outcome <- mr_df_all[mr_df_all$Outcome %like% "AD_Schwartzentruber", ]
+
+  AD_outcome %>%
+  kbl() %>%
+  kable_classic_2(full_width = F)
+
+```
+
+# Sort by significant p-values and filter
+```{r}
+mr_df_filtered <- AD_outcome %>%
+  filter(qvalue < 0.05)
+
+mr_df_filtered <- mr_df_filtered %>%
+  rename(Beta = bxy, StandardError = se, Pvalue = p, SNPs = nsnp, LowerCI = LCI, UpperCI =  UCI)
+
+mr_df_filtered <- mr_df_filtered %>% arrange(desc(Beta_exponent))
+
+mr_df_filtered$Log_Beta <- log(mr_df_filtered$Beta_exponent)
+mr_df_filtered$Log_LowerCI <- log(mr_df_filtered$LowerCI)
+mr_df_filtered$Log_UpperCI <- log(mr_df_filtered$UpperCI)
+
+  mr_df_filtered %>%
+  kbl() %>%
+  kable_classic_2(full_width = F)
+```
+
+# Create a figure with AD as the outcome
+```{r fig.width=20, fig.height=40, echo=FALSE}
+
+mr_df_chart <- mr_df_filtered %>%
+  filter(qvalue < 0.0001)
+
+AD_outcome_stringent <- mr_df_chart
+vroom_write(x = AD_outcome_stringent, file = "/scratch/groups/ukbiobank/usr/alish/AD_MR/AD_outcome_stringent")
+
+mr_df_chart <- mr_df_chart[complete.cases(mr_df_chart), ]
+
+#Tidy up the names of some proteins
+mr_df_chart$Exposure <- sub("^(.*)[.].*", "\\1",mr_df_chart$Exposure)
+mr_df_chart$Exposure <- sub("^(.*)[.].*", "\\1",mr_df_chart$Exposure)
+mr_df_chart$Exposure <- sub("^(.*)[.].*", "\\1",mr_df_chart$Exposure)
+mr_df_chart$Exposure <- sub("^(.*)[.].*", "\\1",mr_df_chart$Exposure)
+
+mr_df_chart$Outcome <- sub("^(.*)[.].*", "\\1",mr_df_chart$Outcome)
+mr_df_chart$Outcome <- sub("^(.*)[.].*", "\\1",mr_df_chart$Outcome)
+mr_df_chart$Outcome <- sub("^(.*)[.].*", "\\1",mr_df_chart$Outcome)
+mr_df_chart$Outcome <- sub("^(.*)[.].*", "\\1",mr_df_chart$Outcome)
+
+mr_df_chart <- mr_df_chart[!duplicated(mr_df_chart$Exposure), ]
+
+library(scales)
+
+ggplot(mr_df_chart, aes(x=reorder(as.factor(Exposure), Beta_exponent) , y=Beta_exponent)) +
+    geom_boxplot(fill="slateblue") + coord_flip() + geom_errorbar(aes(ymax = UpperCI, ymin = LowerCI))+ ggtitle("Outcome - Alzheimer's") +
+  xlab("Exposure Variable") + ylab("Odds Ratio (95% Confidence Interval)")+ geom_hline(yintercept=1, linetype="dashed", color = "red") +
+  theme_bw() + theme(text=element_text(size=25, family="Arial")) +
+  geom_hline(linetype = "dashed", yintercept = 1) +
+    theme(panel.grid.major.x = element_line(size = 0.5,
+                                        linetype = 'dashed',
+                                        colour = "gray41"),
+        panel.grid.major.y = element_line(size = 0.1,
+                                        linetype = 'solid',
+                                        colour = "gray62")) +
+  scale_y_log10(breaks = c(-1, 0.5, 1, 1.5, 2, 2.5)) +
+  guides(color = guide_legend(reverse = TRUE)) +
+  coord_flip(clip = "off", ylim = c(-1,3))
+
+```
+
+# AD -> PROTEIN
+#Get all GSMR data
+
+```{r echo=FALSE}
+
+sun_mr <- get_mr(study = "sun", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+suhre_mr <- get_mr(study = "suhre", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+folk_mr <- get_mr(study = "folk", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+sliz_mr <- get_mr(study = "sliz", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+wood_mr <- get_mr(study = "wood", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+ahol_mr <- get_mr(study = "ahol", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+scal_mr <- get_mr(study = "scal", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+hill_mr <- get_mr(study = "hill", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+hogl_mr <- get_mr(study = "hogl", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+enroth_mr <- get_mr(study = "enroth", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+deco_mr <- get_mr(study = "deco", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+
+```
+
+# Combine all to count how many exposures we had as proteins
+```{r echo=FALSE}
+# combine all to count how many exposures and outcomes we had
+mr_df_all <- rbind(folk_mr, suhre_mr, sun_mr, wood_mr, ahol_mr, scal_mr, hill_mr, hogl_mr, enroth_mr, deco_mr)
+als <- str_count(mr_df_all$Exposure, "AD")
+als[is.na(als)] <- 0
+sum(als)
+```
+
+# Combine all to count how many exposures we had as ALS
+```{r}
+markers <- mr_df_all[mr_df_all$Exposure %like% "AD_Schwartzentruber", ]
+
+nrow(markers)
+```
+
+# Combine full data, work out odds ratios and 95% CI
+```{r}
+
+mr_df_all$Beta_exponent <- exp(mr_df_all$bxy)
+mr_df_all$LCI <- mr_df_all$Beta_exponent - (mr_df_all$se * 1.96)
+mr_df_all$UCI <- mr_df_all$Beta_exponent + (mr_df_all$se * 1.96)
+
+mr_df_all$Exposure <- gsub(".txt", "",mr_df_all$Exposure)
+mr_df_all$Outcome <- gsub(".txt", "",mr_df_all$Outcome)
+```
+
+# Compute q-values and add them to the large combined data frame
+```{r}
+pvalues <- mr_df_all$p
+qobj <- qvalue(p = pvalues)
+lfdr <- qobj$lfdr
+summary(qobj)
+hist(qobj)
+plot(qobj)
+
+qvalues <- as.matrix(qobj$qvalues)
+mr_df_all$qvalue <- cbind(qvalues)
+```
+
+
+# Adjusted p-values using SGoF method
+```{r}
+p <- SGoF(mr_df_all$p)
+summary(p)
+
+plot(p)
+
+p_list <- p$Adjusted.pvalues
+
+mr_df_all <- mr_df_all[order(mr_df_all$p),]
+mr_df_all$sgof <- p_list
+```
+
+# All effects AD exposure
+```{r}
+
+mr_df_all$p.adjust <- p.adjust(p = mr_df_all$p, method = "fdr")
+
+AD_exposure <- mr_df_all[mr_df_all$Exposure %like% "AD_Schwartzentruber", ]
+
+  AD_exposure %>%
+  kbl() %>%
+  kable_classic_2(full_width = F)
+
+```
+
+# Sort by significant p-values
+```{r}
+mr_df_filtered <- AD_exposure %>%
+  filter(qvalue < 0.05)
+
+mr_df_filtered <- mr_df_filtered %>%
+  rename(Beta = bxy, StandardError = se, Pvalue = p, SNPs = nsnp, LowerCI = LCI, UpperCI =  UCI, AdjustedPvalue = p.adjust)
+
+mr_df_filtered <- mr_df_filtered %>% arrange(desc(Beta_exponent))
+
+mr_df_filtered$Log_Beta <- log(mr_df_filtered$Beta_exponent)
+mr_df_filtered$Log_LowerCI <- log(mr_df_filtered$LowerCI)
+mr_df_filtered$Log_UpperCI <- log(mr_df_filtered$UpperCI)
+
+  mr_df_filtered %>%
+  kbl() %>%
+  kable_classic_2(full_width = F)
+
+```
+
+# Create a figure with AD as the exposure
+
+```{r echo=FALSE}
+
+mr_df_chart <- mr_df_filtered %>%
+  filter(qvalue < 0.0001)
+
+AD_exposure_stringent <- mr_df_chart
+vroom_write(x = AD_exposure_stringent, file = "/scratch/groups/ukbiobank/usr/alish/AD_MR/AD_exposure_stringent")
+
+mr_df_chart <- mr_df_chart[complete.cases(mr_df_chart), ]
+
+#Tidy up the names of some proteins
+mr_df_chart$Exposure <- sub("^(.*)[.].*", "\\1",mr_df_chart$Exposure)
+mr_df_chart$Exposure <- sub("^(.*)[.].*", "\\1",mr_df_chart$Exposure)
+mr_df_chart$Exposure <- sub("^(.*)[.].*", "\\1",mr_df_chart$Exposure)
+mr_df_chart$Exposure <- sub("^(.*)[.].*", "\\1",mr_df_chart$Exposure)
+
+mr_df_chart$Outcome <- sub("^(.*)[.].*", "\\1",mr_df_chart$Outcome)
+mr_df_chart$Outcome <- sub("^(.*)[.].*", "\\1",mr_df_chart$Outcome)
+mr_df_chart$Outcome <- sub("^(.*)[.].*", "\\1",mr_df_chart$Outcome)
+mr_df_chart$Outcome <- sub("^(.*)[.].*", "\\1",mr_df_chart$Outcome)
+
+mr_df_chart <- mr_df_chart[!duplicated(mr_df_chart$Outcome), ]
+
+library(scales)
+
+ggplot(mr_df_chart, aes(x=reorder(as.factor(Outcome), Beta_exponent) , y=Beta_exponent)) +
+    geom_boxplot(fill="slateblue") + coord_flip() + geom_errorbar(aes(ymax = UpperCI, ymin = LowerCI))+ ggtitle("Exposure - Alzheimer's") +
+  xlab("Outcome Variable") + ylab("Odds Ratio (95% Confidence Interval)")+ geom_hline(yintercept=1, linetype="dashed", color = "red") + ylim(-0.5, 2.5) +
+  theme_bw() + theme(text=element_text(size=10, family="Arial")) +
+    theme(panel.grid.major.x = element_line(size = 0.5,
+                                        linetype = 'dashed',
+                                        colour = "gray41"),
+        panel.grid.major.y = element_line(size = 0.1,
+                                        linetype = 'solid',
+                                        colour = "gray62")) +
+  scale_y_log10(breaks = c(-1, 0.5, 1, 1.5, 2, 2.5)) +
+  guides(color = guide_legend(reverse = TRUE)) +
+  coord_flip(clip = "off", ylim = c(-1,3))
+
+```

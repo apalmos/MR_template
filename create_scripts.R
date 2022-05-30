@@ -9,13 +9,18 @@ library(vroom)
 
 
 ## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#set up the directories for which scripts need be created
 dirs <- list.dirs(recursive = FALSE)
 elements_2_remove <- c("./.git", "./scripts")
 dirs = dirs[!(dirs %in% elements_2_remove)]
 
 n=1
+
+#slice decides by how many GWASs each script set will be split by; for example, if there are 600 GWASs and slice is set to 150, 4 different script sets will be generated
+
 slice=150
 
+#this loop screates all scripts, for each folder directory
 for (j in dirs){
   all_prots <- vroom(paste0(dirs[n],"/full_list"),col_names = FALSE)
   repn <- round(nrow(all_prots)/slice)
@@ -24,9 +29,13 @@ for (j in dirs){
   sep <- c("'")
   for (i in 1:n_split){
 
+  #here we write the array, according to the slice vector
+
     split_list <- as.data.frame(splitted[i])
     vroom_write(x = split_list, file = paste0(dirs[n],"/list",i,".txt"), col_names = FALSE, delim = ',')
     flag <- paste0("flag",i,".txt")
+
+    #this script makes the initial slurm command for launching the array
 
     mr <- c("#!/bin/bash",
             "#SBATCH --nodes=4",
@@ -54,6 +63,7 @@ for (j in dirs){
 
     writeLines(mr, paste0(dirs[n],"/MR",dirs_clean[n],i,".sh"))
 
+    #this script does a little bit of cleaning of the GWASs and creates marker_name files corresponding to the GWAS being analysed. This makes future analyses easier as the protein name and code (for lookup in the metadata) will be available
 
     clean <- c("#!/bin/bash",
             " ",
@@ -78,6 +88,8 @@ for (j in dirs){
     )
 
     writeLines(clean, paste0(dirs[n],"/mass_mr",i,".sh"))
+
+    #this script runs GSMR. The settings can be changed according to user needs. See the MR_template is any of the below dependencies are missing
 
     MR <- c("#!/bin/bash",
             "#SBATCH --nodes=4",
