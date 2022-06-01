@@ -4,6 +4,8 @@ file <- commandArgs(trailingOnly = TRUE)
   library(tidyverse)
   library(vroom)
 
+file = "DECO2894"
+
 df <- vroom(file, col_names = TRUE)
 
 if("SE" %in% colnames(df)){
@@ -13,7 +15,6 @@ if("SE" %in% colnames(df)){
 
   df <- df[!duplicated(df$SNP), ]
 
-  # vroom_write(x = df, file = file, col_names = TRUE)
 
     } else if ("STDERR" %in% colnames(df)){
 
@@ -23,4 +24,5 @@ if("SE" %in% colnames(df)){
         df <- df[!duplicated(df$SNP), ]
 
     }
-        
+
+vroom_write(x = df, file = file, col_names = TRUE)
