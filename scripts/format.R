@@ -4,12 +4,23 @@ file <- commandArgs(trailingOnly = TRUE)
   library(tidyverse)
   library(vroom)
 
-  df <- read.table(file, header = TRUE)
+df <- vroom(file, col_names = TRUE)
+
+if("SE" %in% colnames(df)){
 
   df <- df %>%
     select(SNP, A1, A2, MAF, BETA, SE, P, N)
 
   df <- df[!duplicated(df$SNP), ]
 
-  vroom_write(x = df, file = file, col_names = TRUE)
-  
+  # vroom_write(x = df, file = file, col_names = TRUE)
+
+    } else if ("STDERR" %in% colnames(df)){
+
+        df <- df %>%
+          select(SNP, A1, A2, MAF, BETA, STDERR, P, N)
+
+        df <- df[!duplicated(df$SNP), ]
+
+    }
+        

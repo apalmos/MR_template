@@ -78,36 +78,13 @@ for (j in dirs){
             "Rscript ../scripts/format.R ${original}",
             paste0("echo ''${name} ${original}'' > marker${number}.txt"),
             "echo ''$original'' > marker_name${number}.txt",
-            "sbatch -p brc mr_script${number}.sh",
             " ",
-            paste0("while [ ! -f ",flag," ]"),
-            "do",
-            "    sleep 30s",
-            "done",
-            "rm flag${number}.txt",
-            "sleep 30s"
+            #this script runs GSMR. The settings can be changed according to user needs. See the MR_template is any of the below dependencies are missing
+            "../../gcta/gcta --bfile /scratch/groups/ukbiobank/usr/alish/1KG_Phase3.WG.CLEANED.EUR_MAF001 --gsmr-file marker${number}.txt target.txt --gsmr-direction 2 --effect-plot --ref-ld-chr /scratch/groups/ukbiobank/KCL_Data/Software/eur_w_ld_chr_for_mtcojo/ --w-ld-chr /scratch/groups/ukbiobank/KCL_Data/Software/eur_w_ld_chr_for_mtcojo/ --out ./output/${code} --gwas-thresh 5e-8 --clump-r2 0.05 --heidi-thresh 0.01 --gsmr-snp-min 1 --gsmr-ld-fdr 0.05 --thread-num 4 --diff-freq 0.8",
+            " "
     )
 
     writeLines(clean, paste0(dirs[n],"/mass_mr",i,".sh"))
-
-    #this script runs GSMR. The settings can be changed according to user needs. See the MR_template is any of the below dependencies are missing
-    MR <- c("#!/bin/bash",
-            "#SBATCH --nodes=1",
-            "#SBATCH --mem-per-cpu=18G",
-            "#SBATCH -t 48:00:00",
-            " ",
-            paste0("number=",i),
-            " ",
-            "code=`cat marker_name${number}.txt`",
-            " ",
-            "../../gcta/gcta --bfile /scratch/groups/ukbiobank/usr/alish/1KG_Phase3.WG.CLEANED.EUR_MAF001 --gsmr-file marker${number}.txt target.txt --gsmr-direction 2 --effect-plot --ref-ld-chr /scratch/groups/ukbiobank/KCL_Data/Software/eur_w_ld_chr_for_mtcojo/ --w-ld-chr /scratch/groups/ukbiobank/KCL_Data/Software/eur_w_ld_chr_for_mtcojo/ --out ./output/${code} --gwas-thresh 5e-8 --clump-r2 0.05 --heidi-thresh 0.01 --gsmr-snp-min 1 --gsmr-ld-fdr 0.05 --thread-num 4 --diff-freq 0.8",
-            " ",
-            "echo 'check' > flag${number}.txt",
-            " ",
-            "rm ${code}"
-            )
-
-    writeLines(MR, paste0(dirs[n],"/mr_script",i,".sh"))
 
   }
 
