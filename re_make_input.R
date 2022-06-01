@@ -29,26 +29,35 @@ make_list <- function(study, dir){
   setwd(paste0(current_dir,"/",study,"_mr/output/"))
 
   list <- list.files(pattern = "*.gsmr")
-  mr <- lapply(list, read.delim)
-  bind <- do.call(rbind.data.frame, mr)
-  bind$file_name = rep(list, each =2)
+  df_worked <- as.data.frame(list)
+  df_worked$list <-   gsub("\\.gsmr*","",df_worked$list)
+
+  list_failed <- list.files(pattern = "*.freq.badsnps")
+  df_failed <- as.data.frame(list_failed)
+  df_failed$list_failed <-   gsub("\\.freq.badsnps*","",df_failed$list_failed)
+
+  worked = merge(df_worked, df_failed, all = TRUE, by = 1)
+
+  #mr <- lapply(list, read.delim)
+  #bind <- do.call(rbind.data.frame, mr)
+  #bind$file_name = rep(list, each =2)
   n_lists <- list.files(path = paste0(current_dir,"/",study,"_mr/"), pattern = "^list")
 
-  worked = data.frame()
-  worked <- unique(bind$file_name)
-  worked = data.frame(worked)
-  worked$worked <-   gsub("\\..*","",worked$worked)
+  #worked = data.frame()
+  #worked <- unique(bind$file_name)
+  #worked = data.frame(worked)
+  #worked$worked <-   gsub("\\..*","",worked$worked)
 
   for (i in n_lists){
 
     list <- read.table(paste0(current_dir,"/",study,"_mr/",i), sep = ",")
-    names(list)[2] <- "worked"
-    worked_list <- setdiff(list$worked, worked$worked)
+    names(list)[2] <- "list"
+    worked_list <- setdiff(list$list, worked$list)
     worked_list = data.frame(worked_list)
-    names(worked_list)[1] <- "worked"
+    names(worked_list)[1] <- "list"
     re_do <- merge(worked_list, list)
     re_do <- re_do %>%
-      select(V1, worked)
+      select(V1, list)
 
     write.table(x = re_do, file = paste0(current_dir,"/",study,"_mr/",i), quote = FALSE, row.names = FALSE, col.names = FALSE, sep = ",")
     print(paste0("from ", study,"_",i,": ", nrow(re_do)," to go"))
