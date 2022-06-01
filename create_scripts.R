@@ -74,7 +74,7 @@ for (j in dirs){
             " ",
             paste0("echo 'running cleaning!'"),
             paste0("cp /scratch/groups/gwas_sumstats/cleaned/blood_biomarkers/${original}.gz ./"),
-            "gunzip ${original}".gz,
+            "gunzip ${original}.gz",
             "Rscript ../scripts/format.R ${original}",
             paste0("echo ''${name} ${original}'' > marker${number}.txt"),
             "echo ''$original'' > marker_name${number}.txt",
