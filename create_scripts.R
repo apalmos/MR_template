@@ -82,7 +82,7 @@ for (j in dirs){
             #this script runs GSMR. The settings can be changed according to user needs. See the MR_template is any of the below dependencies are missing
             "../../gcta/gcta --bfile /scratch/groups/ukbiobank/usr/alish/1KG_Phase3.WG.CLEANED.EUR_MAF001 --gsmr-file marker${number}.txt target.txt --gsmr-direction 2 --effect-plot --ref-ld-chr /scratch/groups/ukbiobank/KCL_Data/Software/eur_w_ld_chr_for_mtcojo/ --w-ld-chr /scratch/groups/ukbiobank/KCL_Data/Software/eur_w_ld_chr_for_mtcojo/ --out ./output/${code} --gwas-thresh 5e-8 --clump-r2 0.05 --heidi-thresh 0.01 --gsmr-snp-min 1 --gsmr-ld-fdr 0.05 --thread-num 4 --diff-freq 0.8",
             " ",
-            rm ${original}
+            "rm ${original}"
     )
 
     writeLines(clean, paste0(dirs[n],"/mass_mr",i,".sh"))
