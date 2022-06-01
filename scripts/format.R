@@ -4,8 +4,6 @@ file <- commandArgs(trailingOnly = TRUE)
   library(tidyverse)
   library(vroom)
 
-file = "DECO2894"
-
 df <- vroom(file, col_names = TRUE)
 
 if("SE" %in% colnames(df)){
