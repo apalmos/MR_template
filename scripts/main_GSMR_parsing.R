@@ -1,31 +1,15 @@
----
-title: "PWMR_analysis_script"
-author: "Alish Palmos"
-date: "09/02/2021"
-output: html_document
-editor_options:
-  chunk_output_type: console
----
-
-This script is designed to work with the PWMR pipeline: https://github.com/apalmos/MR_template
-
-The script automatically cycles through all the /output directories and gathers significant results.
-
-#Set-up
-```{r echo=FALSE}
+## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 rm(list=ls())
-```
 
-The phenotype needs to be provided as an input when running the script from the terminal
-```{r setup, include=FALSE}
+
+## ----setup, include=FALSE--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 
 root_wd <- getwd()
 wd <- paste0("../",root_wd)
-```
 
-## Read in arguments
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 args <- commandArgs(trailingOnly = TRUE)
 
 hh <- paste(unlist(args),collapse=' ')
@@ -41,10 +25,8 @@ print(options.args)
 
 phenotype <- args[1]
 pval <- args[2]
-```
 
-## Packages
-```{r include=FALSE}
+## ----include=FALSE---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 library(data.table)
 library(jtools)
 library(knitr)
@@ -60,10 +42,9 @@ library(kableExtra)
 library(vroom)
 library(openxlsx)
 library(scales)
-```
 
-Function to automatically detect .gsmr output files and read them into a data frame, for each study
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #get MR function
 get_mr <- function(study, dir, extra = NULL){
 
@@ -105,11 +86,9 @@ get_mr <- function(study, dir, extra = NULL){
   assign(paste0(study,"_mr"),value = bind)
 
 }
-```
 
-#PROTEIN -> AD
-#Get all GSMR data
-```{r echo=FALSE}
+
+## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 sun_mr <- get_mr(study = "sun", dir = wd)
 suhre_mr <- get_mr(study = "suhr", dir = wd)
 folk_mr <- get_mr(study = "folk", dir = wd)
@@ -121,34 +100,29 @@ hill_mr <- get_mr(study = "hill", dir = wd)
 hogl_mr <- get_mr(study = "hogl", dir = wd)
 enroth_mr <- get_mr(study = "enroth", dir = wd)
 deco_mr <- get_mr(study = "deco", dir = wd)
-```
 
-#Create workbook for all results
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 wb <- createWorkbook()
-```
 
-# Combine all
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # combine all to make a master df
 mr_df_all <- rbind(folk_mr, sliz_mr, suhre_mr, sun_mr, wood_mr, ahol_mr, scal_mr, hill_mr, hogl_mr, enroth_mr, deco_mr)
-```
 
-# Count number of exposures as proteins
-```{r echo=FALSE}
+
+## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 prot_exposure <- mr_df_all[mr_df_all$Exposure %like% paste0(phenotype), ]
 nrow(prot_exposure)
-```
 
-# Combine full data, work out odds ratios and 95% CI
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 mr_df_all$Beta_exponent <- exp(mr_df_all$bxy)
 mr_df_all$LCI <- mr_df_all$Beta_exponent - (mr_df_all$se * 1.96)
 mr_df_all$UCI <- mr_df_all$Beta_exponent + (mr_df_all$se * 1.96)
-```
 
-# Compute q-values and add them to the large combined data frame
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 pvalues <- mr_df_all$p
 qobj <- qvalue(p = pvalues)
 lfdr <- qobj$lfdr
@@ -158,10 +132,9 @@ plot(qobj)
 
 qvalues <- as.matrix(qobj$qvalues)
 mr_df_all$qvalue <- cbind(qvalues)
-```
 
-# Adjusted p-values using SGoF method
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 p <- SGoF(mr_df_all$p)
 summary(p)
 
@@ -171,20 +144,17 @@ p_list <- p$Adjusted.pvalues
 
 mr_df_all <- mr_df_all[order(mr_df_all$p),]
 mr_df_all$p_adjusted_SGoF <- p_list
-```
 
-# PROTEIN -> OUTCOME
-## All effects with protein exposure
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 all_prot_exposure <- mr_df_all[mr_df_all$Outcome %like% paste0(phenotype), ]
 
 #add results to workbook
 addWorksheet(wb, sheetName = "sll_protein_exposure")
 writeData(wb, sheet = "sll_protein_exposure", all_prot_exposure, rowNames = TRUE)
-```
 
-## Sort by significant p-values and filter
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 all_prot_exposure_filtered <- all_prot_exposure %>%
   filter(qvalue < 0.05)
 
@@ -202,11 +172,9 @@ all_prot_exposure_filtered$Log_UpperCI <- all_prot_exposure_filtered$Log_Beta + 
 #add results to workbook
 addWorksheet(wb, sheetName = "sig_protein_exposure")
 writeData(wb, sheet = "sig_protein_exposure", all_prot_exposure_filtered, rowNames = TRUE)
-```
 
-## Create a figure
-Here the p-value is provided as a command line input parameter
-```{r fig.width=20, fig.height=40, echo=FALSE}
+
+## ----fig.width=20, fig.height=40, echo=FALSE-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 all_prot_exposure_chart <- all_prot_exposure_filtered %>%
   filter(qvalue < paste0(pval))
@@ -234,14 +202,9 @@ all_prot_exposure_fig <-
 #add results to workbook
 addWorksheet(wb, sheetName = "chart_protein_exposure")
 writeData(wb, sheet = "chart_protein_exposure", all_prot_exposure_chart, rowNames = TRUE)
-```
 
 
-# OUTCOME -> PROTEIN
-Note: if the p-value threshold differed between prtein -> outcome and outcome -> protein, then here you need to specify the 'extra' argument which will collect the outcome -> protein results from a nested folder within the root direcotry.
-
-For example, 'curren_dir/extra/study_name/outcome' will become the new source of results. Almost always it will be the outcome (not the protein) that is set to a different p-value threshold. This is because most protein studies are underpowered so they require a lower p-value threshold, whereas most phenotype GWASs are well powered enough to have a more stringent p-value.
-```{r echo=FALSE}
+## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #example of how to run the extra argument
 # sun_mr <- get_mr(study = "sun", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
 # suhre_mr <- get_mr(study = "suhre", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
@@ -255,30 +218,25 @@ For example, 'curren_dir/extra/study_name/outcome' will become the new source of
 # enroth_mr <- get_mr(study = "enroth", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
 # deco_mr <- get_mr(study = "deco", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
 
-```
 
-IF p-value thresholds for detecting SNP instruments were different, then you would need to re-read all of the data into a new dataframe and repeat the steps above. Here we assume that you don't need to do so, and therefore these scipts have been greyed out.
-# Combine all
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # combine all to make a master df
 # mr_df_all <- rbind(folk_mr, sliz_mr, suhre_mr, sun_mr, wood_mr, ahol_mr, scal_mr, hill_mr, hogl_mr, enroth_mr, deco_mr)
-```
 
-# Count number of outcomes as proteins
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 prot_outcome <- mr_df_all[mr_df_all$Outcome %like% paste0(phenotype), ]
 nrow(prot_outcome)
-```
 
-# Combine full data, work out odds ratios and 95% CI
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # mr_df_all$Beta_exponent <- exp(mr_df_all$bxy)
 # mr_df_all$LCI <- mr_df_all$Beta_exponent - (mr_df_all$se * 1.96)
 # mr_df_all$UCI <- mr_df_all$Beta_exponent + (mr_df_all$se * 1.96)
-```
 
-# Compute q-values and add them to the large combined data frame
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # pvalues <- mr_df_all$p
 # qobj <- qvalue(p = pvalues)
 # lfdr <- qobj$lfdr
@@ -288,10 +246,9 @@ nrow(prot_outcome)
 #
 # qvalues <- as.matrix(qobj$qvalues)
 # mr_df_all$qvalue <- cbind(qvalues)
-```
 
-# Adjusted p-values using SGoF method
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # p <- SGoF(mr_df_all$p)
 # summary(p)
 #
@@ -301,19 +258,17 @@ nrow(prot_outcome)
 #
 # mr_df_all <- mr_df_all[order(mr_df_all$p),]
 # mr_df_all$p_adjusted_SGoF <- p_list
-```
 
-## All effects with protein exposure
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 all_prot_outcome <- mr_df_all[mr_df_all$Exposure %like% paste0(phenotype), ]
 
 #add results to workbook
 addWorksheet(wb, sheetName = "all_protein_outcome")
 writeData(wb, sheet = "all_protein_outcome", all_prot_exposure, rowNames = TRUE)
-```
 
-## Sort by significant p-values and filter
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 all_prot_outcome_filtered <- all_prot_outcome %>%
   filter(qvalue < 0.05)
 
@@ -331,11 +286,9 @@ all_prot_outcome_filtered$Log_UpperCI <- all_prot_outcome_filtered$Log_Beta + (a
 #add results to workbook
 addWorksheet(wb, sheetName = "sig_protein_outcome")
 writeData(wb, sheet = "sig_protein_outcome", all_prot_outcome_filtered, rowNames = TRUE)
-```
 
-## Create a figure
-Here the p-value is provided as a command line input parameter
-```{r fig.width=20, fig.height=40, echo=FALSE}
+
+## ----fig.width=20, fig.height=40, echo=FALSE-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 all_prot_outcome_chart <- all_prot_outcome_filtered %>%
   filter(qvalue < paste0(pval))
@@ -363,11 +316,9 @@ all_prot_outcome_fig <-
 #add results to workbook
 addWorksheet(wb, sheetName = "chart_protein_outcome")
 writeData(wb, sheet = "chart_protein_outcome", all_prot_outcome_chart, rowNames = TRUE)
-```
 
-# Create output folder and export
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 dir.create(file.path(wd, "outputs"))
 output_dir <- paste0(wd,"/outputs")
 saveWorkbook(wb, file = paste0(output_dir,"/main_GSMR_output"), overwrite = TRUE)
-```

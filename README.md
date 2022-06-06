@@ -127,4 +127,7 @@ This will also show you how many files still need to be run.
 ```
 bash begin.sh
 ```
-## Soon: analysis scripts for parsing all the data will be automated
+## Once all the analyses are done, you can create an excel file with all output files
+```
+Rscript scripts/main_GSMR_parsing.R AD 0.001
+```
