@@ -130,13 +130,17 @@ bash begin.sh
 
 # Sensitivity analsyes
 
-## Once all the analyses are done, you can create an excel file with all output files. Note that phenotype_name should be replaced with the same phenotype as the one used in GWAS naming above. In addition, the p_val should be set at the desired p-value (corrected) for creating the final figure
+## Once all the analyses are done, you can create an excel file with all output files.
+
+Note that phenotype_name should be replaced with the same phenotype as the one used in GWAS naming above. In addition, the p_val should be set at the desired p-value (corrected) for creating the final figure
 ```
 Rscript scripts/main_GSMR_parsing.R phenotype_name p_val
 ```
-## Once the main results are extracted, you may want to run sensitivity analyses using the TwoSampleMR package. Running these, parsing the results and creating figures can be carried out with one command. Note that the name of the phenotype should be the same as the one used in GWAS naming above. Also the column headers needs to be as described above.
+## Once the main results are extracted, you may want to run sensitivity analyses using the TwoSampleMR package.
+
+Running these, parsing the results and creating figures can be carried out with one command. Note that the name of the phenotype should be the same as the one used in GWAS naming above. Also the column headers needs to be as described above.
 ```
 Rscript scripts/sensitivity_analyses.R phenotype_name
 ```
 
-## The above script will create output folders containing all SNP data + figure for each protein from GSMR results & all SNP data + figure for each protein from TwoSampleMR using MR Egger, Weighted Median, Inverse variance weighted, Simple mode & Weighted mode methods.
+The above script will create output folders containing all SNP data + figure for each protein from GSMR results & all SNP data + figure for each protein from TwoSampleMR using MR Egger, Weighted Median, Inverse variance weighted, Simple mode & Weighted mode methods.
