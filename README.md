@@ -105,7 +105,7 @@ Note: I highly recommend setting up a conda environment with the necessary R pac
 Rscript create_scripts.R
 ```
 
-## Copy your GWAS into the parent direcotry (MR_template) & run
+## Copy your GWAS into the parent directory (MR_template) & run
 ```
 bash setting_up.sh GWAS_filename You_name_for_GWAS
 ```
@@ -127,7 +127,16 @@ This will also show you how many files still need to be run.
 ```
 bash begin.sh
 ```
-## Once all the analyses are done, you can create an excel file with all output files
+
+# Sensitivity analsyes
+
+## Once all the analyses are done, you can create an excel file with all output files. Note that phenotype_name should be replaced with the same phenotype as the one used in GWAS naming above. In addition, the p_val should be set at the desired p-value (corrected) for creating the final figure
 ```
-Rscript scripts/main_GSMR_parsing.R AD 0.001
+Rscript scripts/main_GSMR_parsing.R phenotype_name p_val
 ```
+## Once the main results are extracted, you may want to run sensitivity analyses using the TwoSampleMR package. Running these, parsing the results and creating figures can be carried out with one command. Note that the name of the phenotype should be the same as the one used in GWAS naming above. Also the column headers needs to be as described above.
+```
+Rscript scripts/sensitivity_analyses.R phenotype_name
+```
+
+## The above script will create output folders containing all SNP data + figure for each protein from GSMR results & all SNP data + figure for each protein from TwoSampleMR using MR Egger, Weighted Median, Inverse variance weighted, Simple mode & Weighted mode methods.

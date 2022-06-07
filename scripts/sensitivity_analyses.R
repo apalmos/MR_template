@@ -1,27 +1,15 @@
----
-title: "sensitivity_analyses"
-author: "Alish Palmos"
-date: "14/04/2022"
-output: html_document
-editor_options:
-  chunk_output_type: console
----
-
-This script is designed to take the results from all GSMR analyses and run the TwoSampleMR sensitivity analysis to check for overlapping results. First, SNPs from the GSMR analyses need to be extracted, after whcih they are fed into the TwoSampleMR pipeline.
-
-#Set-up
-```{r echo=FALSE}
+## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 rm(list=ls())
-```
 
-```{r setup, include=FALSE}
+
+## ----setup, include=FALSE--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 
 wd <- getwd()
 dir.create(file.path(wd, "outputs/sensitivity"))
-```
 
-```{r include=FALSE}
+
+## ----include=FALSE---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 source(file = "scripts/package_check.R")
 
 packages <- c("data.table",
@@ -43,15 +31,13 @@ packages <- c("data.table",
               "gridGraphics")
 
 package_check(packages)
-```
 
-# Functions to get SNP infro from GSMR
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 source("scripts/GSMR_read.R")
-```
 
-## Read in arguments
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 args <- commandArgs(trailingOnly = TRUE)
 
 hh <- paste(unlist(args),collapse=' ')
@@ -66,11 +52,9 @@ names(options.args) <- unlist(options.names)
 print(options.args)
 
 phenotype <- args[1]
-```
 
-# PROTEIN -> AD
-# Create a loop for getting all the GSMR data into a spreadsheet
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 dir.create(file.path(wd, "outputs/sensitivity/protein_exposure"))
 dir.create(file.path(wd, "outputs/sensitivity/protein_exposure/gsmr_out"))
 output_dir <- paste0(wd, "/outputs/sensitivity/protein_exposure/gsmr_out")
@@ -125,10 +109,9 @@ for(number in 1:length(filename)){
 
 saveWorkbook(wb, file = paste0(wd,"/outputs/sensitivity/protein_exposure/protein_exposure_gsmr.xlsx"), overwrite = TRUE)
 
-```
 
-#TwoSampleMR Sensitivity Analyses
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 dir.create(file.path(wd, "outputs/sensitivity/protein_exposure/2SMR_out"))
 output_dir <- paste0(wd, "/outputs/sensitivity/protein_exposure/2SMR_out")
 
@@ -156,22 +139,22 @@ rm(wb)
 wb <- createWorkbook()
 
 # Make the columns as follows:
-# SNP                 
-# beta                
-# SE                 
-# effect_allele      
+# SNP
+# beta
+# SE
+# effect_allele
 # non-effective allele
-# p-value            
+# p-value
 # effect_allele freq
 
 #using TwoSampleMR, read in the outcome of interest
 outcome_dat <- read_outcome_data(
   filename = paste0(wd,"/",phenotype,".txt"),
-  sep = " ",                
-  snp_col = "SNP",          
-  beta_col = "BETA",         
-  se_col = "SE",        
-  effect_allele_col = "A1",  
+  sep = " ",
+  snp_col = "SNP",
+  beta_col = "BETA",
+  se_col = "SE",
+  effect_allele_col = "A1",
   other_allele_col = "A2",
   eaf = "MAF",
   samplesize_col = "N",
@@ -254,11 +237,9 @@ for(number in 1:length(filename)){
 #save the entire excel workbook with all the sensitivity analyses
 saveWorkbook(wb, file = paste0(wd,"/outputs/sensitivity/protein_exposure/protein_exposure_2SMR.xlsx"), overwrite = TRUE)
 
-```
 
-# AD -> PROTEIN
-# Create a loop for getting all the GSMR data into a Google Sheet
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 dir.create(file.path(wd, "outputs/sensitivity/protein_outcome"))
 dir.create(file.path(wd, "outputs/sensitivity/protein_outcome/gsmr_out"))
 output_dir <- paste0(wd, "/outputs/sensitivity/protein_outcome/gsmr_out")
@@ -312,10 +293,9 @@ for(number in 1:length(filename)){
 }
 
 saveWorkbook(wb, file = paste0(wd,"/outputs/sensitivity/protein_outcome/protein_outcome_gsmr.xlsx"), overwrite = TRUE)
-```
 
-#TwoSampleMR Sensitivity Analyses
-```{r}
+
+## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 dir.create(file.path(wd, "outputs/sensitivity/protein_outcome/2SMR_out"))
 output_dir <- paste0(wd, "/outputs/sensitivity/protein_outcome/2SMR_out")
 
@@ -342,12 +322,12 @@ write.table(gwas, file = paste0(wd,"/outputs/sensitivity/gwas_pval"), col.names=
 
 
 # Make the columns as follows:
-# SNP                 
-# beta                
-# SE                 
-# effect_allele      
+# SNP
+# beta
+# SE
+# effect_allele
 # non-effective allele
-# p-value            
+# p-value
 # effect_allele freq
 
 number <- 1
@@ -363,11 +343,11 @@ for(number in 1:length(filename)){
   #using TwoSampleMR, read in the outcome of interest
   exposure_dat <- read_exposure_data(
   filename = paste0(wd,"/outputs/sensitivity/gwas_pval"),
-  sep = "\t",                
-  snp_col = "SNP",          
-  beta_col = "BETA",         
-  se_col = "SE",        
-  effect_allele_col = "A1",  
+  sep = "\t",
+  snp_col = "SNP",
+  beta_col = "BETA",
+  se_col = "SE",
+  effect_allele_col = "A1",
   other_allele_col = "A2",
   eaf = "MAF",
   samplesize_col = "N",
@@ -432,5 +412,3 @@ for(number in 1:length(filename)){
 
 #save the entire excel workbook with all the sensitivity analyses
 saveWorkbook(wb, file = paste0(wd,"/outputs/sensitivity/protein_outcome/protein_outcome_2SMR.xlsx"), overwrite = TRUE)
-
-```

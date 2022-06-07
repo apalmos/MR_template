@@ -5,8 +5,7 @@ rm(list=ls())
 ## ----setup, include=FALSE--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 
-root_wd <- getwd()
-wd <- paste0("../",root_wd)
+wd <- getwd()
 
 
 ## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -25,6 +24,7 @@ print(options.args)
 
 phenotype <- args[1]
 pval <- args[2]
+
 
 ## ----include=FALSE---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 library(data.table)
@@ -183,7 +183,7 @@ all_prot_exposure_chart <- all_prot_exposure_chart[complete.cases(all_prot_expos
 
 #add suffixt to any duplicated proteins
 all_prot_exposure_chart$Exposure <- as.character(all_prot_exposure_chart$Exposure)
-all_prot_exposure_chart$Exposure <- make.unique(all_prot_exposure_chart$Exposure, sep = ".")
+all_prot_exposure_chart$Exposure <- make.names(all_prot_exposure_chart$Exposure,unique=T)
 
 #create figure
 all_prot_exposure_fig <-
@@ -297,7 +297,7 @@ all_prot_outcome_chart <- all_prot_outcome_chart[complete.cases(all_prot_outcome
 
 #add suffixt to any duplicated proteins
 all_prot_outcome_chart$Exposure <- as.character(all_prot_outcome_chart$Exposure)
-all_prot_outcome_chart$Exposure <- make.unique(all_prot_outcome_chart$Exposure, sep = ".")
+all_prot_outcome_chart$Exposure <- make.names(all_prot_outcome_chart$Exposure,unique=T)
 
 #create figure
 all_prot_outcome_fig <-
@@ -321,4 +321,4 @@ writeData(wb, sheet = "chart_protein_outcome", all_prot_outcome_chart, rowNames 
 ## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 dir.create(file.path(wd, "outputs"))
 output_dir <- paste0(wd,"/outputs")
-saveWorkbook(wb, file = paste0(output_dir,"/main_GSMR_output"), overwrite = TRUE)
+saveWorkbook(wb, file = paste0(output_dir,"/main_GSMR_output.xlsx"), overwrite = TRUE)
