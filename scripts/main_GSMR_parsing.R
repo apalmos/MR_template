@@ -213,6 +213,7 @@ addWorksheet(wb, sheetName = "chart_protein_exposure")
 writeData(wb, sheet = "chart_protein_exposure", all_prot_exposure_chart, rowNames = TRUE)
 
 
+
 ## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #example of how to run the extra argument
 # sun_mr <- get_mr(study = "sun", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
@@ -331,3 +332,7 @@ writeData(wb, sheet = "chart_protein_outcome", all_prot_outcome_chart, rowNames 
 dir.create(file.path(wd, "outputs"))
 output_dir <- paste0(wd,"/outputs")
 saveWorkbook(wb, file = paste0(output_dir,"/main_GSMR_output.xlsx"), overwrite = TRUE)
+
+#save the plots
+ggsave(filename = paste0(output_dir,"/all_prot_exposure_fig"), plot = all_prot_exposure_fig, width = 6, height = 4, device='tiff', dpi=700)
+ggsave(filename = paste0(output_dir,"/all_prot_outcome_fig"), plot = all_prot_outcome_fig, width = 6, height = 4, device='tiff', dpi=700)
