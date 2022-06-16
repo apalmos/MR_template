@@ -53,6 +53,9 @@ get_mr <- function(study, dir, extra = NULL){
   current_dir <- dir
   setwd(paste0(current_dir,"/",study,"_mr/output/"))
   list <- list.files(pattern = "*.gsmr")
+
+  if(any(list > 1)) {
+
   mr <- lapply(list, read.delim)
   bind <- do.call(rbind.data.frame, mr)
   title <- str_to_title(study)
@@ -66,6 +69,7 @@ get_mr <- function(study, dir, extra = NULL){
   assign(paste0(study,"_mr"),value = bind)
 
   }
+  }
 
   else
 
@@ -73,6 +77,9 @@ get_mr <- function(study, dir, extra = NULL){
 
   setwd(paste0(current_dir,"/",study,"_mr/",extra,"output/"))
   list <- list.files(pattern = "*.gsmr")
+
+  if(any(list > 1)) {
+
   mr <- lapply(list, read.delim)
   bind <- do.call(rbind.data.frame, mr)
   title <- str_to_title(study)
@@ -85,6 +92,7 @@ get_mr <- function(study, dir, extra = NULL){
   bind_n <- count(bind)
   assign(paste0(study,"_mr"),value = bind)
 
+  }
 }
 
 
@@ -108,7 +116,8 @@ wb <- createWorkbook()
 
 ## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # combine all to make a master df
-mr_df_all <- rbind(folk_mr, sliz_mr, suhre_mr, sun_mr, wood_mr, ahol_mr, scal_mr, hill_mr, hogl_mr, enroth_mr, deco_mr)
+all_studies <- list(folk_mr, sliz_mr, suhre_mr, sun_mr, wood_mr, ahol_mr, scal_mr, hill_mr, hogl_mr, enroth_mr, deco_mr)
+mr_df_all = do.call(rbind, all_studies)
 
 
 ## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
