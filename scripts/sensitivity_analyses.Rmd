@@ -189,7 +189,7 @@ for(number in 1:length(filename)){
     select(SNP = snp)
 
   #get the whole GWAS from the same protein
-  original_protein <- vroom(paste0("/scratch/groups/gwas_sumstats/cleaned/blood_biomarkers/",filename[number],".gz"))
+  original_protein <- vroom(paste0("/scratch/prj/gwas_sumstats/cleaned/blood_biomarkers/",filename[number],".gz"))
 
   #join the shorter and the longer protein data together
   full_df <-  inner_join(df, original_protein)
@@ -379,7 +379,7 @@ for(number in 1:length(filename)){
   current_protein <- readWorkbook(xlsxFile = paste0(wd,"/outputs/sensitivity/protein_outcome/protein_outcome_gsmr.xlsx"), sheet = paste0(label[number]), rowNames = TRUE)
 
   #get the whole GWAS from the same protein
-  original_protein <- vroom(paste0("/scratch/groups/gwas_sumstats/cleaned/blood_biomarkers/",filename[number],".gz"))
+  original_protein <- vroom(paste0("/scratch/prj/gwas_sumstats/cleaned/blood_biomarkers/",filename[number],".gz"))
 
   #get all the columns that we need
   full_df <- original_protein %>%

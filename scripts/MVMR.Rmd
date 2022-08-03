@@ -16,7 +16,7 @@ rm(list=ls())
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-setwd("/scratch/groups/ukbiobank/usr/alish/AD_MR/")
+setwd("/scratch/prj/ukbiobank/usr/alish/AD_MR/")
 ```
 
 ```{r include=FALSE}
@@ -40,7 +40,7 @@ library(vroom)
 
 source("/scratch/users/k1463257/packages/demo_AMD/summary_mvMR_SSS.R")
 source("/scratch/users/k1463257/packages/demo_AMD/summary_mvMR_BF.R")
-source("/scratch/groups/ukbiobank/usr/alish/AD_MR/MVMR/GSMR_read.R")
+source("/scratch/prj/ukbiobank/usr/alish/AD_MR/MVMR/GSMR_read.R")
 
 ```
 
@@ -48,7 +48,7 @@ source("/scratch/groups/ukbiobank/usr/alish/AD_MR/MVMR/GSMR_read.R")
 #Create matrix to be used in method
 ```{r}
 
-AD_outcome_stringent <- vroom(file = "/scratch/groups/ukbiobank/usr/alish/AD_MR/AD_outcome_stringent")
+AD_outcome_stringent <- vroom(file = "/scratch/prj/ukbiobank/usr/alish/AD_MR/AD_outcome_stringent")
 
 head(AD_outcome_stringent)
 
@@ -67,7 +67,7 @@ AD_outcome_stringent$names <- make.names(AD_outcome_stringent$Exposure,unique=T)
 names <- AD_outcome_stringent$names
 marker <- AD_outcome_stringent$Exposure
 brain <- AD_outcome_stringent$Outcome
-path <- "/scratch/groups/ukbiobank/usr/alish/AD_MR/"
+path <- "/scratch/prj/ukbiobank/usr/alish/AD_MR/"
 label <- paste(AD_outcome_stringent$clean_names, AD_outcome_stringent$study, sep = "_")
 no_dups <- make.unique(label, sep = ".")
 
@@ -90,7 +90,7 @@ for(number in 1:length(filename)){
 
   snp_data <- as.data.frame(snp_data)
 
-  write.table(snp_data, file = paste0("/scratch/groups/ukbiobank/usr/alish/AD_MR//sensitivity/MVMR/",no_dups[number]), col.names=T, row.names=F, quote=F,sep = "\t")
+  write.table(snp_data, file = paste0("/scratch/prj/ukbiobank/usr/alish/AD_MR//sensitivity/MVMR/",no_dups[number]), col.names=T, row.names=F, quote=F,sep = "\t")
 
 }
 
@@ -100,7 +100,7 @@ for(number in 1:length(filename)){
 ```{r}
 #POSITIVE
 
-AD_outcome_mvmr <- vroom(file = "/scratch/groups/ukbiobank/usr/alish/AD_MR/AD_outcome_stringent")
+AD_outcome_mvmr <- vroom(file = "/scratch/prj/ukbiobank/usr/alish/AD_MR/AD_outcome_stringent")
 
 AD_outcome_mvmr <- AD_outcome_mvmr %>%
   filter(Beta > 0)
@@ -114,7 +114,7 @@ AD_outcome_mvmr$names <- make.names(AD_outcome_mvmr$Exposure,unique=T)
 names <- AD_outcome_mvmr$names
 marker <- AD_outcome_mvmr$Exposure
 brain <- AD_outcome_mvmr$Outcome
-path <- "/scratch/groups/ukbiobank/usr/alish/AD_MR/"
+path <- "/scratch/prj/ukbiobank/usr/alish/AD_MR/"
 label <- paste(AD_outcome_mvmr$clean_names, AD_outcome_mvmr$study, sep = "_")
 no_dups <- make.unique(label, sep = ".")
 filename <- gsub(".txt", "", AD_outcome_mvmr$file_name)
@@ -123,14 +123,14 @@ filename <- gsub(".txt", "", AD_outcome_mvmr$file_name)
 number <- 1
 zones = list()
 
-ad <- vroom(paste0("/scratch/groups/ukbiobank/usr/alish/AD_MR/AD_Schwartzentruber.txt"))
+ad <- vroom(paste0("/scratch/prj/ukbiobank/usr/alish/AD_MR/AD_Schwartzentruber.txt"))
 
 #next we need to read the SNPs into a single data frame
 for(number in 1:length(filename)){ #change to for(number in 1:length(filename)){
 
   ename <- paste0(label[number])
   ename
-  zones[[ename]] <- vroom(paste0("/scratch/groups/ukbiobank/usr/alish/AD_MR/sensitivity/MVMR/",label[number]))
+  zones[[ename]] <- vroom(paste0("/scratch/prj/ukbiobank/usr/alish/AD_MR/sensitivity/MVMR/",label[number]))
 
   matrix <- list()
 
@@ -151,7 +151,7 @@ filename <- toupper(filename)
 # finally we need to match all the variants from all the markers into a single data frame. This kept crashing, which is why it has been split so many times
 for(number in 1:length(filename)){ #change to for(number in 1:length(filename)){
 
-  original_protein <- vroom(paste0("/scratch/groups/gwas_sumstats/cleaned/blood_biomarkers/",filename[number],".gz"),)
+  original_protein <- vroom(paste0("/scratch/prj/gwas_sumstats/cleaned/blood_biomarkers/",filename[number],".gz"),)
 
   original_protein = original_protein[!duplicated(original_protein$SNP),]
 
@@ -166,14 +166,14 @@ for(number in 1:length(filename)){ #change to for(number in 1:length(filename)){
 
 # save the data frame half way as this keep crashing
 #export the final data frame as it takes such a long time to make
-write.table(joined_data, file = paste0("/scratch/groups/ukbiobank/usr/alish/AD_MR//sensitivity/MVMR/joined_data_positive"), col.names=T, row.names=F, quote=F,sep = "\t")
+write.table(joined_data, file = paste0("/scratch/prj/ukbiobank/usr/alish/AD_MR//sensitivity/MVMR/joined_data_positive"), col.names=T, row.names=F, quote=F,sep = "\t")
 
 ```
 
 ```{r}
 
 #import the data frame and make a labelled list
-joined_data <- fread(paste0("/scratch/groups/ukbiobank/usr/alish/AD_MR//sensitivity/MVMR/joined_data_positive"), verbose = T, data.table = F, fill=TRUE)
+joined_data <- fread(paste0("/scratch/prj/ukbiobank/usr/alish/AD_MR//sensitivity/MVMR/joined_data_positive"), verbose = T, data.table = F, fill=TRUE)
 
 # joined_data <- joined_data[ , apply(joined_data, 2, function(x) !any(is.na(x)))]
 
@@ -399,7 +399,7 @@ Q_tab[sort.ix$ix,][1:30,]
 ```{r}
 #POSITIVE
 
-AD_outcome_mvmr <- vroom(file = "/scratch/groups/ukbiobank/usr/alish/AD_MR/AD_outcome_stringent")
+AD_outcome_mvmr <- vroom(file = "/scratch/prj/ukbiobank/usr/alish/AD_MR/AD_outcome_stringent")
 
 AD_outcome_mvmr <- AD_outcome_mvmr %>%
   filter(Beta < 0)
@@ -413,7 +413,7 @@ AD_outcome_mvmr$names <- make.names(AD_outcome_mvmr$Exposure,unique=T)
 names <- AD_outcome_mvmr$names
 marker <- AD_outcome_mvmr$Exposure
 brain <- AD_outcome_mvmr$Outcome
-path <- "/scratch/groups/ukbiobank/usr/alish/AD_MR/"
+path <- "/scratch/prj/ukbiobank/usr/alish/AD_MR/"
 label <- paste(AD_outcome_mvmr$clean_names, AD_outcome_mvmr$study, sep = "_")
 no_dups <- make.unique(label, sep = ".")
 filename <- gsub(".txt", "", AD_outcome_mvmr$file_name)
@@ -422,14 +422,14 @@ filename <- gsub(".txt", "", AD_outcome_mvmr$file_name)
 number <- 1
 zones = list()
 
-ad <- vroom(paste0("/scratch/groups/ukbiobank/usr/alish/AD_MR/AD_Schwartzentruber.txt"))
+ad <- vroom(paste0("/scratch/prj/ukbiobank/usr/alish/AD_MR/AD_Schwartzentruber.txt"))
 
 #next we need to read the SNPs into a single data frame
 for(number in 1:length(filename)){ #change to for(number in 1:length(filename)){
 
   ename <- paste0(label[number])
   ename
-  zones[[ename]] <- vroom(paste0("/scratch/groups/ukbiobank/usr/alish/AD_MR/sensitivity/MVMR/",label[number]))
+  zones[[ename]] <- vroom(paste0("/scratch/prj/ukbiobank/usr/alish/AD_MR/sensitivity/MVMR/",label[number]))
 
   matrix <- list()
 
@@ -450,7 +450,7 @@ filename <- toupper(filename)
 # finally we need to match all the variants from all the markers into a single data frame. This kept crashing, which is why it has been split so many times
 for(number in 1:length(filename)){ #change to for(number in 1:length(filename)){
 
-  original_protein <- vroom(paste0("/scratch/groups/gwas_sumstats/cleaned/blood_biomarkers/",filename[number],".gz"),)
+  original_protein <- vroom(paste0("/scratch/prj/gwas_sumstats/cleaned/blood_biomarkers/",filename[number],".gz"),)
 
   original_protein = original_protein[!duplicated(original_protein$SNP),]
 
@@ -465,14 +465,14 @@ for(number in 1:length(filename)){ #change to for(number in 1:length(filename)){
 
 # save the data frame half way as this keep crashing
 #export the final data frame as it takes such a long time to make
-write.table(joined_data, file = paste0("/scratch/groups/ukbiobank/usr/alish/AD_MR//sensitivity/MVMR/joined_data_negative"), col.names=T, row.names=F, quote=F,sep = "\t")
+write.table(joined_data, file = paste0("/scratch/prj/ukbiobank/usr/alish/AD_MR//sensitivity/MVMR/joined_data_negative"), col.names=T, row.names=F, quote=F,sep = "\t")
 
 ```
 
 ```{r}
 
 #import the data frame and make a labelled list
-joined_data <- fread(paste0("/scratch/groups/ukbiobank/usr/alish/AD_MR//sensitivity/MVMR/joined_data_negative"), verbose = T, data.table = F, fill=TRUE)
+joined_data <- fread(paste0("/scratch/prj/ukbiobank/usr/alish/AD_MR//sensitivity/MVMR/joined_data_negative"), verbose = T, data.table = F, fill=TRUE)
 
 # joined_data <- joined_data[ , apply(joined_data, 2, function(x) !any(is.na(x)))]
 

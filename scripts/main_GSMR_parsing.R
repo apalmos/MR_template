@@ -216,17 +216,17 @@ writeData(wb, sheet = "chart_protein_exposure", all_prot_exposure_chart, rowName
 
 ## ----echo=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #example of how to run the extra argument
-# sun_mr <- get_mr(study = "sun", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
-# suhre_mr <- get_mr(study = "suhre", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
-# folk_mr <- get_mr(study = "folk", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
-# sliz_mr <- get_mr(study = "sliz", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
-# wood_mr <- get_mr(study = "wood", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
-# ahol_mr <- get_mr(study = "ahol", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
-# scal_mr <- get_mr(study = "scal", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
-# hill_mr <- get_mr(study = "hill", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
-# hogl_mr <- get_mr(study = "hogl", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
-# enroth_mr <- get_mr(study = "enroth", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
-# deco_mr <- get_mr(study = "deco", dir = "/scratch/groups/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+# sun_mr <- get_mr(study = "sun", dir = "/scratch/prj/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+# suhre_mr <- get_mr(study = "suhre", dir = "/scratch/prj/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+# folk_mr <- get_mr(study = "folk", dir = "/scratch/prj/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+# sliz_mr <- get_mr(study = "sliz", dir = "/scratch/prj/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+# wood_mr <- get_mr(study = "wood", dir = "/scratch/prj/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+# ahol_mr <- get_mr(study = "ahol", dir = "/scratch/prj/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+# scal_mr <- get_mr(study = "scal", dir = "/scratch/prj/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+# hill_mr <- get_mr(study = "hill", dir = "/scratch/prj/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+# hogl_mr <- get_mr(study = "hogl", dir = "/scratch/prj/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+# enroth_mr <- get_mr(study = "enroth", dir = "/scratch/prj/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
+# deco_mr <- get_mr(study = "deco", dir = "/scratch/prj/ukbiobank/usr/alish/AD_MR/", extra = "ADexp/")
 
 
 
