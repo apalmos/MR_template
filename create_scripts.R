@@ -12,8 +12,7 @@ library(rlist)
 ## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #set up the directories for which scripts need be created
 dirs <- list.dirs(recursive = FALSE)
-elements_2_remove <- c("./.git", "./scripts")
-dirs = dirs[!(dirs %in% elements_2_remove)]
+dirs = dirs[ grepl("*mr", dirs) ]
 
 n=1
 
