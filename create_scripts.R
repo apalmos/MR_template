@@ -80,7 +80,7 @@ for (j in dirs){
             "echo ''$original'' > marker_name${number}.txt",
             " ",
             #this script runs GSMR. The settings can be changed according to user needs. See the MR_template is any of the below dependencies are missing
-            "../../gcta/gcta --bfile /scratch/prj/ukbiobank/usr/alish/1KG_Phase3.WG.CLEANED.EUR_MAF001 --gsmr-file marker${number}.txt target.txt --gsmr-direction 2 --effect-plot --ref-ld-chr /scratch/prj/ukbiobank/KCL_Data/Software/eur_w_ld_chr_for_mtcojo/ --w-ld-chr /scratch/prj/ukbiobank/KCL_Data/Software/eur_w_ld_chr_for_mtcojo/ --out ./output/${original} --gwas-thresh 5e-8 --clump-r2 0.05 --heidi-thresh 0.01 --gsmr-snp-min 1 --gsmr-ld-fdr 0.05 --thread-num 4 --diff-freq 0.8",
+            "/scratch/prj/gwas_sumstats/resources/gcta/gcta --bfile /scratch/prj/gwas_sumstats/resources/1KG_Phase3.WG.CLEANED.EUR_MAF001 --gsmr-file marker${number}.txt target.txt --gsmr-direction 2 --effect-plot --ref-ld-chr /scratch/prj/gwas_sumstats/resources/eur_w_ld_chr_for_mtcojo/ --w-ld-chr /scratch/prj/gwas_sumstats/resources/eur_w_ld_chr_for_mtcojo/ --out ./output/${original} --gwas-thresh 5e-8 --clump-r2 0.05 --heidi-thresh 0.01 --gsmr-snp-min 1 --gsmr-ld-fdr 0.05 --thread-num 4 --diff-freq 0.8",
             " ",
             "rm ${original}"
     )
