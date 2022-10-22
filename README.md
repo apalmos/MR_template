@@ -46,7 +46,8 @@ unzip g1000_eur.zip
 Note that the the automated scripts currently run with all files on CREATE HPC, where the 1KG WG data has been cleaned. You may want to consider your own QC if downloading the data above. You would also need to change these commands in the create_scripts.R file to suit the newly downloaded files (if you are on CREATE, you don't need to do anything):
 
 ```
-/scratch/prj/gwas_sumstats/resources/gcta/gcta --bfile /scratch/prj/gwas_sumstats/resources/1KG_Phase3.WG.CLEANED.EUR_MAF001 --gsmr-file marker${number}.txt target.txt --gsmr-direction 2 --effect-plot --ref-ld-chr /scratch/prj/gwas_sumstats/resources/eur_w_ld_chr_for_mtcojo/ --w-ld-chr /scratch/prj/gwas_sumstats/resources/eur_w_ld_chr_for_mtcojo/
+/scratch/prj/gwas_sumstats/resources/gcta/gcta \
+--bfile /scratch/prj/gwas_sumstats/resources/1KG_Phase3.WG.CLEANED.EUR_MAF001 --gsmr-file marker${number}.txt target.txt --gsmr-direction 2 --effect-plot --ref-ld-chr /scratch/prj/gwas_sumstats/resources/eur_w_ld_chr_for_mtcojo/ --w-ld-chr /scratch/prj/gwas_sumstats/resources/eur_w_ld_chr_for_mtcojo/
 ```
 
 ## Copy your GWAS into the correct directory
