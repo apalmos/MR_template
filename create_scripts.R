@@ -17,7 +17,7 @@ dirs = dirs[ grepl("*mr", dirs) ]
 n=1
 
 #slice decides by how many GWASs each script set will be split by; for example, if there are 600 GWASs and slice is set to 150, 4 different script sets will be generated
-slice=150
+slice=200
 
 #this loop screates all scripts, for each folder directory
 for (j in dirs){
