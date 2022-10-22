@@ -70,6 +70,13 @@ Note your GWAS must have the following headers:
 
 SNP / A1 / A2 / MAF / BETA / SE / P / N
 
+Also:
+
+- no missing data
+- no duplicated RSid
+- rows must begin with RSid
+- there must be 8 columns 
+
 For inferring MAFs from the 1KG dataset, please e-mail me.
 
 In your GWAS folder:
