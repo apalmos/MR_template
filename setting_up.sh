@@ -5,7 +5,7 @@ name=$2
 dir=$PWD
 
 #create a target
-echo ${dir}/${name} ${gwas} > target.txt
+echo ${name} ${dir}/${gwas} > target.txt
 
 #copy target into each folder
 cp target.txt ./breth_mr
