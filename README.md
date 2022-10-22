@@ -55,6 +55,13 @@ Note that the the automated scripts currently run with all files on CREATE HPC, 
 --w-ld-chr /scratch/prj/gwas_sumstats/resources/eur_w_ld_chr_for_mtcojo/
 ```
 
+## Environment
+
+There is a copy of the conda environment in the /inflame directory. To load it, enter:
+```
+conda env create -f environment.yml
+```
+
 ## Copy your GWAS into the correct directory
 
 If you are using CREATE and have access to the GWAS sumstats catalogue, then you need to create a folder with the name of your GWAS in the /inflame directory. This is where the analyses will be carried out.

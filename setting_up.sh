@@ -2,23 +2,10 @@
 
 gwas=$1
 name=$2
+dir=$PWD
 
 #create a target
-echo ${name} ${gwas} > target.txt
-
-#copy GWAS into each folder
-cp ${gwas} ./breth_mr
-cp ${gwas} ./deco_mr
-cp ${gwas} ./enroth_mr
-cp ${gwas} ./folk_mr
-cp ${gwas} ./hill_mr
-cp ${gwas} ./hogl_mr
-cp ${gwas} ./infl_mr
-cp ${gwas} ./scal_mr
-cp ${gwas} ./sliz_mr
-cp ${gwas} ./suhr_mr
-cp ${gwas} ./sun_mr
-cp ${gwas} ./wood_mr
+echo ${dir}/${name} ${gwas} > target.txt
 
 #copy target into each folder
 cp target.txt ./breth_mr
