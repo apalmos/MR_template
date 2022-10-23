@@ -14,7 +14,9 @@ for example: runplinkstuff_create.sh MDD01
 
 ## Once the script has finished running, move into the directory with the computed frequencies:
 
+```
 cd /scratch/prj/gwas_sumstats/scripts/computed_frequencies
+```
 
 ## Run the script to concatenate all the chromosomes:
 
