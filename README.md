@@ -75,9 +75,7 @@ Also:
 - no missing data
 - no duplicated RSid
 - rows must begin with RSid
-- there must be 8 columns 
-
-For inferring MAFs from the 1KG dataset, please e-mail me.
+- there must be 8 columns
 
 In your GWAS folder:
 
