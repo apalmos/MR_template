@@ -27,4 +27,4 @@ concat_freq_create.sh NAMEOFGWAS
 ```
 for example concat_freq_create.sh MDD01
 
-Once this is done, you will have to manually merge the newly created MAFs with your GWAS, based on SNPs (RSid)
+## Once this is done, you will have to manually merge the newly created MAFs with your GWAS, based on SNPs (RSid)
