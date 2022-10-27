@@ -9,7 +9,7 @@ cd /scratch/prj/gwas_sumstats/scripts
 ## Run:
 
 ```
-runplinkstuff_create.sh NAMEOFGWAS
+bash runplinkstuff_create.sh NAMEOFGWAS
 
 ```
 for example: runplinkstuff_create.sh MDD01
