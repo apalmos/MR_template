@@ -23,7 +23,7 @@ cd /scratch/prj/gwas_sumstats/scripts/computed_frequencies
 ## Run the script to concatenate all the chromosomes:
 
 ```
-concat_freq_create.sh NAMEOFGWAS
+bash concat_freq_create.sh NAMEOFGWAS
 ```
 for example concat_freq_create.sh MDD01
 
