@@ -275,7 +275,7 @@ all_prot_outcome <- mr_df_all[mr_df_all$Exposure %like% paste0(phenotype), ]
 
 #add results to workbook
 addWorksheet(wb, sheetName = "all_protein_outcome")
-writeData(wb, sheet = "all_protein_outcome", all_prot_exposure, rowNames = TRUE)
+writeData(wb, sheet = "all_protein_outcome", all_prot_outcome, rowNames = TRUE)
 
 
 ## --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
