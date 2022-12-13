@@ -121,7 +121,7 @@ bash begin.sh
 
 Note that phenotype_name should be replaced with the same phenotype as the one used in GWAS naming above. In addition, the p_val should be set at the desired p-value (corrected) for creating the final figure
 ```
-Rscript scripts/main_GSMR_parsing.R phenotype_name p_val
+Rscript scripts/main_GSMR_parsing_221207.R phenotype_name
 ```
 ## Once the main results are extracted, you may want to run sensitivity analyses using the TwoSampleMR package.
 
